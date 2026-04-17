@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+:root {
+  color-scheme: light dark;
+  --fg: #1c1c1e;
+  --bg: #ffffff;
+  --muted: #6e6e73;
+  --rule: #e5e5ea;
+  --code-bg: #f2f2f7;
+  --link: #007aff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #f2f2f7;
+    --bg: #000000;
+    --muted: #8e8e93;
+    --rule: #2c2c2e;
+    --code-bg: #1c1c1e;
+    --link: #0a84ff;
+  }
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 17px/1.5 -apple-system, "SF Pro Text", BlinkMacSystemFont, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+#content {
+  padding: 20px 20px 60px;
+  word-wrap: break-word;
+}
+#content > :first-child { margin-top: 0; }
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+}
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 19px; }
+h4, h5, h6 { font-size: 17px; }
+p { margin: 0.75em 0; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.5em 0;
+}
+code {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 15px;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+}
+blockquote {
+  border-left: 3px solid var(--rule);
+  margin: 0.75em 0;
+  padding: 0.25em 0 0.25em 14px;
+  color: var(--muted);
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 1.5em 0;
+}
+ul, ol { padding-left: 24px; margin: 0.5em 0; }
+li { margin: 0.25em 0; }
+table {
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  width: 100%;
+  font-size: 15px;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  text-align: left;
+}
+th { background: var(--code-bg); font-weight: 600; }
+#empty {
+  color: var(--muted);
+  font-style: italic;
+  padding: 40px 20px;
+  text-align: center;
+}
+</style>
+<script src="marked.min.js"></script>
+</head>
+<body>
+<div id="content"><div id="empty">Empty document</div></div>
+<script>
+function render(md) {
+  const el = document.getElementById('content');
+  if (!md || md.length === 0) {
+    el.innerHTML = '<div id="empty">Empty document</div>';
+    return;
+  }
+  try {
+    el.innerHTML = marked.parse(md, { breaks: true, gfm: true });
+  } catch (e) {
+    el.innerText = String(e);
+  }
+}
+</script>
+</body>
+</html>

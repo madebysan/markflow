@@ -3,8 +3,8 @@ import SwiftUI
 @main
 struct MDReaderApp: App {
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        DocumentGroup(newDocument: MarkdownDocument()) { file in
+            DocumentView(document: file.$document)
         }
     }
 }
