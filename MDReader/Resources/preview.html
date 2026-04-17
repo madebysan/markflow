@@ -10,8 +10,10 @@
   --bg: #ffffff;
   --muted: #6e6e73;
   --rule: #e5e5ea;
-  --code-bg: #f2f2f7;
+  --code-bg: #f6f8fa;
   --link: #007aff;
+  --checkbox-border: #c7c7cc;
+  --checkbox-checked: #34c759;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -19,8 +21,10 @@
     --bg: #000000;
     --muted: #8e8e93;
     --rule: #2c2c2e;
-    --code-bg: #1c1c1e;
+    --code-bg: #161b22;
     --link: #0a84ff;
+    --checkbox-border: #48484a;
+    --checkbox-checked: #30d158;
   }
 }
 html, body {
@@ -72,7 +76,9 @@ pre code {
   background: transparent;
   padding: 0;
   font-size: 14px;
+  display: block;
 }
+pre code.hljs { padding: 0; background: transparent; }
 blockquote {
   border-left: 3px solid var(--rule);
   margin: 0.75em 0;
@@ -86,6 +92,41 @@ hr {
 }
 ul, ol { padding-left: 24px; margin: 0.5em 0; }
 li { margin: 0.25em 0; }
+
+/* Task list (GFM checkboxes) */
+ul.contains-task-list { list-style: none; padding-left: 4px; }
+ul.contains-task-list ul.contains-task-list { padding-left: 20px; }
+li.task-list-item { position: relative; padding-left: 4px; }
+li.task-list-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--checkbox-border);
+  border-radius: 4px;
+  margin: 0 8px 0 0;
+  vertical-align: -3px;
+  background: var(--bg);
+  position: relative;
+  cursor: default;
+}
+li.task-list-item input[type="checkbox"]:checked {
+  background: var(--checkbox-checked);
+  border-color: var(--checkbox-checked);
+}
+li.task-list-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Table */
 table {
   border-collapse: collapse;
   margin: 0.75em 0;
@@ -98,6 +139,16 @@ th, td {
   text-align: left;
 }
 th { background: var(--code-bg); font-weight: 600; }
+
+/* Mermaid */
+.mermaid {
+  background: var(--bg);
+  text-align: center;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+.mermaid svg { max-width: 100%; height: auto; }
+
 #empty {
   color: var(--muted);
   font-style: italic;
@@ -105,23 +156,103 @@ th { background: var(--code-bg); font-weight: 600; }
   text-align: center;
 }
 </style>
+
+<!-- highlight.js theme — swapped at runtime for dark mode -->
+<link rel="stylesheet" id="hljs-theme" href="highlight-github.css">
+
 <script src="marked.min.js"></script>
+<script src="highlight.min.js"></script>
+<script src="mermaid.min.js"></script>
 </head>
 <body>
 <div id="content"><div id="empty">Empty document</div></div>
 <script>
-function render(md) {
-  const el = document.getElementById('content');
-  if (!md || md.length === 0) {
-    el.innerHTML = '<div id="empty">Empty document</div>';
-    return;
+(function() {
+  // Swap highlight.js theme based on color scheme
+  function applyHljsTheme() {
+    const link = document.getElementById('hljs-theme');
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    link.href = dark ? 'highlight-github-dark.css' : 'highlight-github.css';
   }
-  try {
-    el.innerHTML = marked.parse(md, { breaks: true, gfm: true });
-  } catch (e) {
-    el.innerText = String(e);
+  applyHljsTheme();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
+
+  // Configure mermaid — don't auto-start, we'll run it manually
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+    securityLevel: 'loose',
+    flowchart: { htmlLabels: true, curve: 'basis' }
+  });
+
+  // Custom marked renderer — emit mermaid blocks as <pre class="mermaid">
+  // so mermaid's run() picks them up, and skip hljs for them.
+  const renderer = new marked.Renderer();
+  const defaultCode = renderer.code.bind(renderer);
+  renderer.code = function(code, lang, escaped) {
+    // marked v15 passes a token object; normalize
+    let text, language;
+    if (typeof code === 'object' && code !== null) {
+      text = code.text;
+      language = code.lang;
+    } else {
+      text = code;
+      language = lang;
+    }
+    if (language === 'mermaid') {
+      // Mermaid needs the raw source in the element
+      return '<pre class="mermaid">' + escapeHtml(text) + '</pre>\n';
+    }
+    // Let marked handle non-mermaid code; hljs highlights it after innerHTML
+    return defaultCode(code, lang, escaped);
+  };
+
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
-}
+
+  marked.use({ renderer, breaks: true, gfm: true });
+
+  // Expose render() for Swift to call via evaluateJavaScript
+  let mermaidCounter = 0;
+  window.render = async function(md) {
+    const el = document.getElementById('content');
+    if (!md || md.length === 0) {
+      el.innerHTML = '<div id="empty">Empty document</div>';
+      return;
+    }
+    try {
+      el.innerHTML = marked.parse(md);
+
+      // Syntax highlight any language-* code blocks (skip mermaid)
+      el.querySelectorAll('pre code[class*="language-"]').forEach((block) => {
+        try { hljs.highlightElement(block); } catch (e) {}
+      });
+
+      // Render mermaid diagrams — assign unique ids and run
+      const mermaidBlocks = el.querySelectorAll('pre.mermaid');
+      if (mermaidBlocks.length > 0) {
+        mermaidBlocks.forEach((b) => {
+          b.id = 'mermaid-' + (++mermaidCounter);
+          // mermaid.run expects elements to be class="mermaid" divs or pre;
+          // keeps the raw text, renders SVG in place
+        });
+        try {
+          await mermaid.run({ nodes: mermaidBlocks });
+        } catch (e) {
+          console.error('mermaid error:', e);
+        }
+      }
+    } catch (e) {
+      el.innerText = String(e);
+    }
+  };
+})();
 </script>
 </body>
 </html>

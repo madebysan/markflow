@@ -3,16 +3,20 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		03D4CED30F30FEFE88259589 /* preview.html in Resources */ = {isa = PBXBuildFile; fileRef = 1548C8F8D97FB6DE55C0973A /* preview.html */; };
 		06283C523A7A830684AA078F /* marked.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 1B18F870604C14D0F9353051 /* marked.min.js */; };
 		4BC9A13FACFEC3320781F264 /* MDReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFF51D26C9FF45FFBA64FA3A /* MDReaderApp.swift */; };
+		4CD51662D68AE09282CB7FB3 /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = AC34BCD6D293863E3B42D005 /* highlight-github.css */; };
+		69458412B6971594B2594D39 /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = FE115710798405339FBBCBC6 /* highlight.min.js */; };
+		78221D25FD5DD18DBF268AEB /* mermaid.min.js in Resources */ = {isa = PBXBuildFile; fileRef = D6C50D37B359F0EA57864CB8 /* mermaid.min.js */; };
 		8422323526B3FF0D3679F8EB /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58D6226C32F1F955BB4E0DE /* EditView.swift */; };
 		8BBF1D2F2411631A3FAFB905 /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90A0A2F286861321FBB6EACB /* DocumentView.swift */; };
 		AF0E8EF379EB5C9C9C50235E /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC1B4EC9FD1A669FEE0C898 /* MarkdownDocument.swift */; };
+		F0A42FC66BF4DA0A658D0768 /* highlight-github-dark.css in Resources */ = {isa = PBXBuildFile; fileRef = BEE1EAD52F6183F4A18BF5E9 /* highlight-github-dark.css */; };
 		F345DA6A1C950C44FB79A1C3 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A0A6DFB39D7B8080EC808 /* PreviewView.swift */; };
 /* End PBXBuildFile section */
 
@@ -20,11 +24,15 @@
 		116A0A6DFB39D7B8080EC808 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		1548C8F8D97FB6DE55C0973A /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
 		1B18F870604C14D0F9353051 /* marked.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = marked.min.js; sourceTree = "<group>"; };
-		53DED5154D56B7C28050E568 /* MDReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		53DED5154D56B7C28050E568 /* MDReader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MDReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		90A0A2F286861321FBB6EACB /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
+		AC34BCD6D293863E3B42D005 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
+		BEE1EAD52F6183F4A18BF5E9 /* highlight-github-dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github-dark.css"; sourceTree = "<group>"; };
 		C58D6226C32F1F955BB4E0DE /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		CDC1B4EC9FD1A669FEE0C898 /* MarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocument.swift; sourceTree = "<group>"; };
+		D6C50D37B359F0EA57864CB8 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
 		EFF51D26C9FF45FFBA64FA3A /* MDReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDReaderApp.swift; sourceTree = "<group>"; };
+		FE115710798405339FBBCBC6 /* highlight.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -68,7 +76,11 @@
 		DCC8CD2A3A6832FAA2F6194F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BEE1EAD52F6183F4A18BF5E9 /* highlight-github-dark.css */,
+				AC34BCD6D293863E3B42D005 /* highlight-github.css */,
+				FE115710798405339FBBCBC6 /* highlight.min.js */,
 				1B18F870604C14D0F9353051 /* marked.min.js */,
+				D6C50D37B359F0EA57864CB8 /* mermaid.min.js */,
 				1548C8F8D97FB6DE55C0973A /* preview.html */,
 			);
 			path = Resources;
@@ -105,6 +117,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					63E7C78D8DCA6EAF62D87CF6 = {
+						DevelopmentTeam = 3KBA253B3F;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -119,6 +132,7 @@
 			);
 			mainGroup = 88ABB4D75C27212A5F8EBF95;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -132,7 +146,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0A42FC66BF4DA0A658D0768 /* highlight-github-dark.css in Resources */,
+				4CD51662D68AE09282CB7FB3 /* highlight-github.css in Resources */,
+				69458412B6971594B2594D39 /* highlight.min.js in Resources */,
 				06283C523A7A830684AA078F /* marked.min.js in Resources */,
+				78221D25FD5DD18DBF268AEB /* mermaid.min.js in Resources */,
 				03D4CED30F30FEFE88259589 /* preview.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -231,7 +249,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MDReader;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
@@ -316,7 +333,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MDReader;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
