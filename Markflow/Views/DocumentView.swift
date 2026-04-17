@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct DocumentView: View {
     let documentText: String
     let sourceURL: URL?
+    let onClose: () -> Void
 
     @State private var mode: Mode = .preview
     @State private var workingText: String = ""
@@ -30,35 +31,10 @@ struct DocumentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Picker("Mode", selection: $mode) {
-                    ForEach(Mode.allCases) { m in
-                        Text(m.label).tag(m)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                ShareLink(
-                    item: exportedFileURL(),
-                    preview: SharePreview(exportFileName)
-                ) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 18, weight: .regular))
-                        .foregroundStyle(hasUnsavedChanges ? Color.accentColor : Color.secondary)
-                        .frame(width: 32, height: 32)
-                }
-                .disabled(workingText.isEmpty)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(.bar)
-
-            Divider()
-
+        Group {
             switch mode {
             case .preview:
-                PreviewView(markdown: workingText, baseURL: sourceURL?.deletingLastPathComponent())
+                PreviewView(markdown: workingText, baseURL: nil)
             case .edit:
                 EditView(text: $workingText)
             }
@@ -67,6 +43,37 @@ struct DocumentView: View {
             if !didInit {
                 workingText = documentText
                 didInit = true
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    onClose()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                }
+            }
+
+            ToolbarItem(placement: .principal) {
+                Picker("Mode", selection: $mode) {
+                    ForEach(Mode.allCases) { m in
+                        Text(m.label).tag(m)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 180)
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                ShareLink(
+                    item: exportedFileURL(),
+                    preview: SharePreview(exportFileName)
+                ) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 17, weight: .semibold))
+                }
+                .disabled(workingText.isEmpty)
             }
         }
     }

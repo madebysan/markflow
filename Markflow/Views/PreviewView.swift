@@ -43,7 +43,11 @@ struct PreviewView: UIViewRepresentable {
         guard let url = Bundle.main.url(forResource: "preview", withExtension: "html") else {
             return
         }
-        let resolvedBase = baseURL ?? url.deletingLastPathComponent()
+        // Always use the bundle's preview.html directory as baseURL so the
+        // vendored marked.js / highlight.js / mermaid.js load from the same
+        // folder. Known v0 limitation: relative image paths in the user's
+        // markdown won't resolve — users need absolute URLs for images.
+        let resolvedBase = url.deletingLastPathComponent()
         do {
             let html = try String(contentsOf: url, encoding: .utf8)
             webView.loadHTMLString(html, baseURL: resolvedBase)

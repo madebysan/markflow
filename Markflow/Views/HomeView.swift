@@ -2,6 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct HomeView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @State private var showFileImporter = false
     @State private var openedDocument: OpenedDocument?
 
@@ -23,8 +24,8 @@ struct HomeView: View {
                     .padding(.horizontal, 24)
 
                 credit
-                    .padding(.top, 20)
-                    .padding(.bottom, 24)
+                    .padding(.top, 28)
+                    .padding(.bottom, 32)
             }
         }
         .fileImporter(
@@ -49,10 +50,15 @@ struct HomeView: View {
 
     private var backgroundGradient: some View {
         LinearGradient(
-            colors: [
-                Color(red: 0.93, green: 0.94, blue: 1.0),
-                Color(red: 0.87, green: 0.84, blue: 1.0)
-            ],
+            colors: colorScheme == .dark
+                ? [
+                    Color(red: 0.08, green: 0.06, blue: 0.18),
+                    Color(red: 0.14, green: 0.09, blue: 0.26)
+                ]
+                : [
+                    Color(red: 0.93, green: 0.94, blue: 1.00),
+                    Color(red: 0.87, green: 0.84, blue: 1.00)
+                ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -66,16 +72,21 @@ struct HomeView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 128, height: 128)
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                .shadow(color: Color(red: 0.35, green: 0.30, blue: 0.80).opacity(0.25), radius: 24, x: 0, y: 12)
+                .shadow(
+                    color: Color(red: 0.35, green: 0.30, blue: 0.80)
+                        .opacity(colorScheme == .dark ? 0.55 : 0.28),
+                    radius: 28, x: 0, y: 14
+                )
 
             VStack(spacing: 8) {
                 Text("Markflow")
                     .font(.system(size: 42, weight: .bold))
                     .tracking(-0.8)
+                    .foregroundStyle(.primary)
 
                 Text("The iOS reader markdown\nwas missing.")
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary.opacity(0.72))
                     .multilineTextAlignment(.center)
                     .lineSpacing(2)
             }
@@ -84,6 +95,7 @@ struct HomeView: View {
 
     private var actionStack: some View {
         VStack(spacing: 12) {
+            // Primary — Browse
             Button {
                 showFileImporter = true
             } label: {
@@ -98,9 +110,14 @@ struct HomeView: View {
                 .foregroundStyle(.white)
                 .background(primaryGradient)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .shadow(color: Color(red: 0.42, green: 0.38, blue: 0.92).opacity(0.45), radius: 18, x: 0, y: 10)
+                .shadow(
+                    color: Color(red: 0.42, green: 0.38, blue: 0.92)
+                        .opacity(colorScheme == .dark ? 0.65 : 0.45),
+                    radius: 18, x: 0, y: 10
+                )
             }
 
+            // Secondary — Create
             Button {
                 openedDocument = OpenedDocument(text: "", sourceURL: nil)
             } label: {
@@ -113,11 +130,13 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .foregroundStyle(.primary)
-                .background(.thinMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .background(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(.regularMaterial)
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+                        .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
                 )
             }
         }
@@ -138,12 +157,12 @@ struct HomeView: View {
         Link(destination: URL(string: "https://santiagoalonso.com")!) {
             HStack(spacing: 4) {
                 Text("Made by")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary.opacity(0.55))
                 Text("santiagoalonso.com")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary.opacity(0.80))
                     .underline()
             }
-            .font(.system(size: 13, weight: .regular))
+            .font(.system(size: 13, weight: .medium))
         }
     }
 
@@ -181,20 +200,11 @@ private struct DocumentContainer: View {
         NavigationStack {
             DocumentView(
                 documentText: openedDocument.text,
-                sourceURL: openedDocument.sourceURL
+                sourceURL: openedDocument.sourceURL,
+                onClose: onClose
             )
             .navigationTitle(title)
             .toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        onClose()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                }
-            }
         }
     }
 
