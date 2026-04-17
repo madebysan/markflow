@@ -18,6 +18,12 @@ struct PreviewView: UIViewRepresentable {
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         webView.navigationDelegate = context.coordinator
+
+        // Pinch-to-zoom
+        webView.scrollView.minimumZoomScale = 1.0
+        webView.scrollView.maximumZoomScale = 5.0
+        webView.scrollView.bouncesZoom = true
+
         context.coordinator.webView = webView
 
         loadTemplate(into: webView, baseURL: baseURL)
@@ -37,8 +43,6 @@ struct PreviewView: UIViewRepresentable {
         guard let url = Bundle.main.url(forResource: "preview", withExtension: "html") else {
             return
         }
-        // Serve the template with the document's parent directory as the base URL
-        // so relative image paths (e.g. ![alt](image.png)) resolve correctly.
         let resolvedBase = baseURL ?? url.deletingLastPathComponent()
         do {
             let html = try String(contentsOf: url, encoding: .utf8)
@@ -54,8 +58,6 @@ struct PreviewView: UIViewRepresentable {
     }
 
     private static func jsonString(from value: String) -> String {
-        // Wrap in an array, encode, then strip the surrounding [ ].
-        // Produces a safely-quoted JS string literal.
         guard let data = try? JSONEncoder().encode([value]),
               let json = String(data: data, encoding: .utf8),
               json.count >= 2

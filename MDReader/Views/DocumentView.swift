@@ -16,7 +16,19 @@ struct DocumentView: View {
     }
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
+            Picker("Mode", selection: $mode) {
+                ForEach(Mode.allCases) { m in
+                    Text(m.label).tag(m)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(.bar)
+
+            Divider()
+
             switch mode {
             case .preview:
                 PreviewView(markdown: document.text)
@@ -24,16 +36,6 @@ struct DocumentView: View {
                 EditView(text: $document.text)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Picker("Mode", selection: $mode) {
-                    ForEach(Mode.allCases) { m in
-                        Text(m.label).tag(m)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .frame(minWidth: 200)
-            }
-        }
+        .toolbarTitleDisplayMode(.inline)
     }
 }
