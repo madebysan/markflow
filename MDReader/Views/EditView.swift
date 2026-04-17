@@ -10,6 +10,5 @@ struct EditView: View {
             .textInputAutocapitalization(.never)
             .padding(.horizontal, 12)
             .padding(.top, 8)
-            .ignoresSafeArea(.keyboard, edges: .bottom)
     }
 }
