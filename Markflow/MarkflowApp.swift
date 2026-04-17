@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MDReaderApp: App {
+struct MarkflowApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: MarkdownDocument()) { file in
             DocumentView(document: file.$document)

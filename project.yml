@@ -1,4 +1,4 @@
-name: MDReader
+name: Markflow
 options:
   bundleIdPrefix: com.san
   deploymentTarget:
@@ -15,15 +15,17 @@ settings:
     ENABLE_USER_SCRIPT_SANDBOXING: YES
 
 targets:
-  MDReader:
+  Markflow:
     type: application
     platform: iOS
     sources:
-      - path: MDReader
+      - path: Markflow
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.san.mdreader
+        PRODUCT_BUNDLE_IDENTIFIER: com.san.markflow
+        PRODUCT_NAME: Markflow
         GENERATE_INFOPLIST_FILE: NO
-        INFOPLIST_FILE: MDReader/Info.plist
+        INFOPLIST_FILE: Markflow/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
