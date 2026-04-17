@@ -2,7 +2,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct DocumentView: View {
-    let document: MarkdownDocument
+    let documentText: String
     let sourceURL: URL?
 
     @State private var mode: Mode = .preview
@@ -21,7 +21,7 @@ struct DocumentView: View {
     }
 
     var hasUnsavedChanges: Bool {
-        workingText != document.text
+        workingText != documentText
     }
 
     var exportFileName: String {
@@ -65,7 +65,7 @@ struct DocumentView: View {
         }
         .onAppear {
             if !didInit {
-                workingText = document.text
+                workingText = documentText
                 didInit = true
             }
         }
