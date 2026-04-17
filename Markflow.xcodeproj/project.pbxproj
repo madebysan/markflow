@@ -18,7 +18,6 @@
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
 		915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */; };
 		A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
-		D62540EF5431A277529CA988 /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9756F32FD2E636DAC3587E3 /* MarkdownDocument.swift */; };
 		E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC466180FA15E44EBC9BBF8 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +30,6 @@
 		91C4B697C05D869057F0987D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9BD63FB0C10885B6AC27B18C /* marked.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = marked.min.js; sourceTree = "<group>"; };
 		A1F6B86A64108045E28EE7DE /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
-		A9756F32FD2E636DAC3587E3 /* MarkdownDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownDocument.swift; sourceTree = "<group>"; };
 		B5A3CDF1D48F9F8AF284318C /* highlight.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
 		B96448590D3A726722BFA597 /* MarkflowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkflowApp.swift; sourceTree = "<group>"; };
 		BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
@@ -70,7 +68,6 @@
 			children = (
 				91C4B697C05D869057F0987D /* Assets.xcassets */,
 				0C50858AC1E06350E38CB309 /* Info.plist */,
-				A9756F32FD2E636DAC3587E3 /* MarkdownDocument.swift */,
 				B96448590D3A726722BFA597 /* MarkflowApp.swift */,
 				5E84B632DF95956E659CCA61 /* Resources */,
 				264C903D94BD91CE02E12307 /* Views */,
@@ -174,7 +171,6 @@
 				915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */,
 				4FB2791CD85D2E0947812398 /* EditView.swift in Sources */,
 				E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */,
-				D62540EF5431A277529CA988 /* MarkdownDocument.swift in Sources */,
 				7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */,
 				395F6F4C5714EA9A32868686 /* PreviewView.swift in Sources */,
 			);

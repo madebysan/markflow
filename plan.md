@@ -1,92 +1,59 @@
-# MDReader — v0 Plan
+# Markflow — Plan
 
-## Overview
+## Done this session (2026-04-17)
 
-A minimal iOS markdown reader/editor. User opens a `.md` file from the Files app, sees a segmented control at the top of the screen with **Preview** and **Edit** tabs. Preview renders the markdown (including inline images) using WKWebView + marked.js. Edit is a plain `TextEditor`. Changes save back to the original file automatically via SwiftUI's `DocumentGroup`.
+- **Scaffold**: xcodegen project, SwiftUI + iOS 26, iPhone-only, initial build passing
+- **Core document flow**: `MarkdownDocument` (FileDocument), WKWebView-based preview, TextEditor edit, segmented picker toggle
+- **Preview rendering**: vendored `marked.js` + `highlight.js` + `mermaid.js`, GitHub-style light/dark CSS themes, task list checkboxes
+- **Document-type registration**: hand-authored Info.plist with `CFBundleDocumentTypes` + `UTImportedTypeDeclarations` for `.md`/`.markdown`/`.mdown` — app now appears in iOS share sheet
+- **Pinch zoom**: WKWebView native zoom in Preview, `MagnifyGesture` font scaling in Edit (`@AppStorage` persistence)
+- **Read-only semantics**: switched from `DocumentGroup(newDocument:)` to `DocumentGroup(viewing:)`, then to `WindowGroup` + custom home. Original files are never modified.
+- **Explicit export**: ShareLink in nav bar exports edits as `<name>-edited.md` to a temp file
+- **Rebrand**: MDReader → Markflow, bundle ID `com.san.markflow`, icon installed in asset catalog (upscaled 824→1024)
+- **Custom home page**: drop DocumentGroup's launch browser, add gradient HomeView with app icon, Markflow title, tagline, Browse (primary) + Create (secondary) CTAs, santiagoalonso.com credit link
+- **Dark mode**: home page gradient and shadows swap via `@Environment(\.colorScheme)`; preview CSS already auto-switches
+- **Nav redesign**: Preview/Edit picker moved to `ToolbarItem(.principal)`, Share to `.topBarTrailing`, close chevron to `.topBarLeading` — iOS 26 Liquid Glass pills
+- **Preview bug fix**: WKWebView `baseURL` always points to bundle preview dir so vendored scripts load (was passing document parent URL, breaking marked.js loading)
+- **Dead code removal**: deleted `MarkdownDocument.swift` (orphaned when we dropped DocumentGroup)
 
-## Tech Stack
+## Current state
 
-- **Platform:** iOS 26, iPhone only
-- **Framework:** SwiftUI + `DocumentGroup` (document-based app)
-- **Language:** Swift 5.9+
-- **Preview rendering:** `WKWebView` + vendored `marked.js` (local HTML resource)
-- **Persistence:** none needed beyond the document itself (`DocumentGroup` handles file I/O)
-- **Third-party packages:** none
-- **Design:** Stock Apple HIG — system colors, SF fonts, no custom styling
+- **Build status**: passing (`xcodebuild` + simulator iPhone 16e)
+- **Physical device signing**: team `3KBA253B3F` configured. Needs one-time Xcode GUI provisioning on first device build (Signing & Capabilities → pick team).
+- **Simulator**: iPhone 16 not available on this Mac, using iPhone 16e
+- **Tagline**: "The iOS reader markdown was missing."
 
-## Features
+## Next steps
 
-1. **Open/save .md files** — `DocumentGroup` + `FileDocument` conforming type registered for `public.plain-text` + `net.daringfireball.markdown` UTIs. Gives native file browser, recent files, and automatic save/rename.
-2. **Segmented tab switcher at top** — SwiftUI `Picker` with `.segmented` pickerStyle, placed inside the `NavigationStack` toolbar. Two options: `Preview`, `Edit`. Bound to a `@State var mode: Mode` enum.
-3. **Preview tab (markdown + images)** — `WKWebView` wrapped in `UIViewRepresentable`. Loads an HTML template with `marked.js` embedded. Passes the markdown string via JS. Sets the `baseURL` to the document's parent directory so `![alt](image.png)` resolves against co-located image files.
-4. **Edit tab (plain text editor)** — SwiftUI `TextEditor` bound to `document.text`. Standard iOS keyboard, selection, find-replace included automatically.
-5. **Save on edit** — Because the `TextEditor` is bound to the document via `@Binding`, any change marks the document dirty and `DocumentGroup` saves automatically when the user backgrounds or closes the document. No explicit save button.
+- [ ] First successful device build (needs Xcode GUI provisioning for `com.san.markflow` profile)
+- [ ] Re-export app icon at native 1024×1024 (currently upscaled from 824)
+- [ ] Decide on "Recents" list — dropped when we moved off DocumentGroup. Options: `@AppStorage` keyed by URL bookmarks, or list files in app's Documents folder.
+- [ ] Persist in-memory edits as drafts (lost on close today). Options: `UserDefaults` keyed by source URL, or write to temp on change.
+- [ ] Add press-state scale animation to home buttons (not-boring signature move)
+- [ ] Decide on relative image path support — requires continuous security-scoped access to source directory
 
-## Screen Inventory
+## Decisions & context
 
-| Screen | Purpose | Key state |
-|--------|---------|-----------|
-| **DocumentBrowser (system)** | Native file browser provided by `DocumentGroup`. User picks or creates a `.md` file. | Provided by system — no custom code. |
-| **DocumentView** | The opened file. Segmented control at top, content below (Preview or Edit). | `@State var mode: Mode`, `@Binding var document: MarkdownDocument` |
+- **DocumentGroup dropped in favor of custom root.** Rationale: Markflow is a reader-first app — DocumentGroup's "Create" as primary CTA was wrong. Custom `WindowGroup + HomeView + .fileImporter + .onOpenURL` gives full UI control; share-sheet integration (Open in Markflow) still works via `CFBundleDocumentTypes` + `UTImportedTypeDeclarations`.
+- **Mermaid vendored despite 3 MB cost.** User's example document (A24 presentation) leaned heavily on flowcharts. Rendering them as raw code blocks would have lost the visual flow. App binary grew ~1 MB → ~4.5 MB.
+- **Preview rendering = WKWebView + marked.js** (not native `AttributedString(markdown:)`). Only way to render inline images, tables, and mermaid diagrams. Native APIs don't support any of them.
+- **baseURL always bundle, never source URL parent.** Passing the source dir breaks relative script loading for marked.js/mermaid.js/highlight.js. Trade-off: relative image paths in user markdown don't resolve.
+- **Edits live in memory only.** No auto-save, no draft persistence. User must explicitly export via Share to keep changes. Original file is never touched.
 
-Two screens total (one system-provided, one custom). Well under the 3–7 target.
+## Dependencies added
 
-## File Structure
+- **xcodegen** (`brew install xcodegen`, v2.44.1) — project generation from `project.yml`
+- **Vendored JS libraries** (bundled, offline):
+  - `marked.min.js` (~40 KB) — markdown → HTML
+  - `highlight.min.js` (~125 KB) — syntax highlighting
+  - `mermaid.min.js` (~3 MB) — flowchart rendering
+  - `highlight-github.css` / `highlight-github-dark.css` — light + dark themes
+- No Swift Package Manager dependencies
 
-```
-md-reader/
-├── project.yml                        # xcodegen config
-├── plan.md                            # this file
-├── MDReader/
-│   ├── MDReaderApp.swift              # @main + DocumentGroup
-│   ├── MarkdownDocument.swift         # FileDocument conformance
-│   ├── Views/
-│   │   ├── DocumentView.swift         # segmented control + content
-│   │   ├── PreviewView.swift          # WKWebView wrapper
-│   │   └── EditView.swift             # TextEditor wrapper
-│   └── Resources/
-│       └── preview.html               # HTML template + marked.js
-└── .gitignore
-```
+## v0-swift skill (parallel track)
 
-No Info.plist hand-written — xcodegen's `GENERATE_INFOPLIST_FILE: YES` synthesizes it. Document type UTI registration done via `INFOPLIST_KEY_CFBundleDocumentTypes` in project.yml settings.
+This project was also the first real use of the custom `/v0-swift` skill. The skill itself lives at `~/.claude/skills/v0-swift/` and generated the initial scaffold + first three phases (scaffold, implement, launch) before the session shifted to interactive iteration. Known skill gaps surfaced:
 
-## Implementation Order
-
-1. **MarkdownDocument.swift** — `FileDocument` protocol, UTI registration, init/fileWrapper
-2. **preview.html** — minimal HTML with marked.js inlined or via `<script src>`, a `<div id="content">`, and a JS function `render(md)` that sets `content.innerHTML = marked.parse(md)`
-3. **MDReaderApp.swift** — `DocumentGroup(newDocument:)` wiring
-4. **DocumentView.swift** — segmented control + switch between PreviewView/EditView
-5. **EditView.swift** — `TextEditor` bound to document.text
-6. **PreviewView.swift** — `UIViewRepresentable` wrapping `WKWebView`, loads preview.html from bundle, sets baseURL to document's parent URL, calls render(md) via `evaluateJavaScript` when text changes
-
-## Design Notes
-
-- Stock Apple HIG: NavigationStack title shows the document filename (DocumentGroup handles this). System background colors. SF body font for text editor. No custom tint.
-- Segmented control sits in `.toolbar` with `ToolbarItem(placement: .principal)` so it lives in the nav bar area.
-- No dark mode customization — system-adaptive by default.
-
----
-
-```yaml
-run_contract:
-  max_iterations: 25
-  completion_promise: "V0_SWIFT_COMPLETE"
-  on_stuck: defer_and_continue
-  on_ambiguity: choose_simpler_option
-  on_regression: revert_to_last_clean_commit
-  human_intervention: never
-  simulator_device: "iPhone 16e"
-  ios_target: "26.0"
-  visual_qa_max_passes: 2
-  phase_skip:
-    visual_qa: false
-    polish: false
-  complexity_overrides:
-    open_save_files: "DocumentGroup + FileDocument conforming to .plainText + .init(importedAs: net.daringfireball.markdown)"
-    tab_switcher: "SwiftUI Picker segmented style in ToolbarItem(placement: .principal)"
-    preview_render: "WKWebView via UIViewRepresentable, loads preview.html from bundle, marked.js vendored as resource, baseURL = document parent directory"
-    edit_view: "TextEditor bound to document.text — no custom editor component"
-    save_on_edit: "No explicit save button — DocumentGroup auto-saves on background/close"
-    styling: "Stock Apple HIG — no custom colors, fonts, or tint"
-```
+- **Ralph-loop prompt-file workaround** — ralph-loop's CLI shell-parses its task argument, so multi-line markdown prompts fail. Workaround used: write the prompt to `.v0-swift/prompt.md` and pass a short "read and execute" pointer. Worth baking into the skill.
+- **No reliable iOS Simulator CLI for taps** — AppleScript taps got the rotation wrong and screenshotted sideways. Skill's Phase 4 (Visual QA) should document this and scope its expectations to launch-screen verification only.
+- **Document type registration** — skill mentions the plist approach; the reliable path (hand-authored `Info.plist` + `GENERATE_INFOPLIST_FILE: NO`) should be the default in the skill's scaffold phase, not the fallback.
