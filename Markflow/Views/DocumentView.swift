@@ -25,11 +25,97 @@ struct DocumentView: View {
         }
     }
 
-    var hasUnsavedChanges: Bool {
+    var body: some View {
+        content
+            .onAppear(perform: initializeOnFirstAppear)
+            .toolbar { toolbarContent }
+            .confirmationDialog(
+                "You have unsaved changes",
+                isPresented: $showExitConfirmation,
+                titleVisibility: .visible
+            ) {
+                exitConfirmationActions
+            } message: {
+                Text(exitConfirmationMessage)
+            }
+            .fileExporter(
+                isPresented: $showExporter,
+                document: MarkdownFileDocument(text: workingText),
+                contentType: markdownType,
+                defaultFilename: newFileDefaultName,
+                onCompletion: handleExporterResult
+            )
+            .alert(
+                saveAlert?.title ?? "",
+                isPresented: saveAlertBinding,
+                presenting: saveAlert
+            ) { _ in
+                Button("OK", role: .cancel) {}
+            } message: { alert in
+                Text(alert.message)
+            }
+    }
+
+    // MARK: - Body fragments
+
+    @ViewBuilder
+    private var content: some View {
+        switch mode {
+        case .preview:
+            PreviewView(markdown: workingText, baseURL: nil)
+        case .edit:
+            EditView(text: $workingText)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button(action: attemptClose) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+        }
+
+        ToolbarItem(placement: .principal) {
+            Picker("Mode", selection: $mode) {
+                ForEach(Mode.allCases) { m in
+                    Text(m.label).tag(m)
+                }
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 180)
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            ShareLink(
+                item: MarkdownExport(filename: exportFileName, text: workingText),
+                preview: SharePreview(exportFileName)
+            ) {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .disabled(workingText.isEmpty)
+        }
+    }
+
+    @ViewBuilder
+    private var exitConfirmationActions: some View {
+        if sourceURL != nil {
+            Button("Save") { saveToSource() }
+        }
+        Button("Save as New File…") { showExporter = true }
+        Button("Discard Changes", role: .destructive) { onClose() }
+        Button("Cancel", role: .cancel) {}
+    }
+
+    // MARK: - Derived
+
+    private var hasUnsavedChanges: Bool {
         workingText != documentText
     }
 
-    var exportFileName: String {
+    private var exportFileName: String {
         let base = sourceURL?.deletingPathExtension().lastPathComponent ?? "Untitled"
         return "\(base)-edited.md"
     }
@@ -45,104 +131,29 @@ struct DocumentView: View {
         UTType("net.daringfireball.markdown") ?? .plainText
     }
 
-    var body: some View {
-        Group {
-            switch mode {
-            case .preview:
-                PreviewView(markdown: workingText, baseURL: nil)
-            case .edit:
-                EditView(text: $workingText)
-            }
-        }
-        .onAppear {
-            if !didInit {
-                workingText = documentText
-                if documentText.isEmpty {
-                    mode = .edit
-                }
-                didInit = true
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    attemptClose()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 17, weight: .semibold))
-                }
-            }
+    private var exitConfirmationMessage: String {
+        sourceURL != nil
+            ? "Save overwrites the original file. Save as New File keeps the original untouched."
+            : "Pick a location to save your new markdown file, or discard your work."
+    }
 
-            ToolbarItem(placement: .principal) {
-                Picker("Mode", selection: $mode) {
-                    ForEach(Mode.allCases) { m in
-                        Text(m.label).tag(m)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 180)
-            }
-
-            ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(
-                    item: exportedFileURL(),
-                    preview: SharePreview(exportFileName)
-                ) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 17, weight: .semibold))
-                }
-                .disabled(workingText.isEmpty)
-            }
-        }
-        .confirmationDialog(
-            "You have unsaved changes",
-            isPresented: $showExitConfirmation,
-            titleVisibility: .visible
-        ) {
-            if sourceURL != nil {
-                Button("Save") { saveToSource() }
-            }
-            Button("Save as New File…") { showExporter = true }
-            Button("Discard Changes", role: .destructive) { onClose() }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text(sourceURL != nil
-                 ? "Save overwrites the original file. Save as New File keeps the original untouched."
-                 : "Pick a location to save your new markdown file, or discard your work.")
-        }
-        .fileExporter(
-            isPresented: $showExporter,
-            document: MarkdownFileDocument(text: workingText),
-            contentType: markdownType,
-            defaultFilename: newFileDefaultName
-        ) { result in
-            switch result {
-            case .success:
-                onClose()
-            case .failure(let error):
-                let nsError = error as NSError
-                if nsError.code == NSUserCancelledError { return }
-                saveAlert = SaveAlert(
-                    title: "Couldn't save",
-                    message: error.localizedDescription
-                )
-            }
-        }
-        .alert(
-            saveAlert?.title ?? "",
-            isPresented: Binding(
-                get: { saveAlert != nil },
-                set: { if !$0 { saveAlert = nil } }
-            ),
-            presenting: saveAlert
-        ) { _ in
-            Button("OK", role: .cancel) {}
-        } message: { alert in
-            Text(alert.message)
-        }
+    private var saveAlertBinding: Binding<Bool> {
+        Binding(
+            get: { saveAlert != nil },
+            set: { if !$0 { saveAlert = nil } }
+        )
     }
 
     // MARK: - Actions
+
+    private func initializeOnFirstAppear() {
+        guard !didInit else { return }
+        workingText = documentText
+        if documentText.isEmpty {
+            mode = .edit
+        }
+        didInit = true
+    }
 
     private func attemptClose() {
         if hasUnsavedChanges {
@@ -165,11 +176,35 @@ struct DocumentView: View {
         }
     }
 
-    private func exportedFileURL() -> URL {
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(exportFileName)
-        try? workingText.write(to: tempURL, atomically: true, encoding: .utf8)
-        return tempURL
+    private func handleExporterResult(_ result: Result<URL, Error>) {
+        switch result {
+        case .success:
+            onClose()
+        case .failure(let error):
+            let nsError = error as NSError
+            if nsError.code == NSUserCancelledError { return }
+            saveAlert = SaveAlert(
+                title: "Couldn't save",
+                message: error.localizedDescription
+            )
+        }
+    }
+}
+
+// MARK: - Transferable export (writes lazily, only when share is invoked)
+
+private struct MarkdownExport: Transferable {
+    let filename: String
+    let text: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .plainText) { export in
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent(export.filename)
+            try export.text.write(to: url, atomically: true, encoding: .utf8)
+            return SentTransferredFile(url)
+        }
+        .suggestedFileName { $0.filename }
     }
 }
 

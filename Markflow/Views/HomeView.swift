@@ -16,23 +16,21 @@ struct HomeView: View {
             backgroundGradient
                 .ignoresSafeArea()
 
-            // Animated ambient orbs
-            GeometryReader { proxy in
-                ZStack {
-                    orb(
-                        color: Color(red: 0.56, green: 0.42, blue: 0.95),
-                        size: proxy.size.width * 0.85,
-                        alignment: orbDrift ? .topLeading : .topTrailing,
-                        opacity: colorScheme == .dark ? 0.55 : 0.40
-                    )
-                    orb(
-                        color: Color(red: 0.40, green: 0.58, blue: 1.00),
-                        size: proxy.size.width * 0.75,
-                        alignment: orbDrift ? .bottomTrailing : .bottomLeading,
-                        opacity: colorScheme == .dark ? 0.45 : 0.30
-                    )
-                }
-                .frame(width: proxy.size.width, height: proxy.size.height)
+            // Ambient orbs — transform-based drift (GPU only, no layout pass).
+            ZStack {
+                orb(
+                    color: Color(red: 0.56, green: 0.42, blue: 0.95),
+                    size: 360,
+                    opacity: colorScheme == .dark ? 0.55 : 0.40
+                )
+                .offset(x: orbDrift ? -100 : 100, y: -240)
+
+                orb(
+                    color: Color(red: 0.40, green: 0.58, blue: 1.00),
+                    size: 320,
+                    opacity: colorScheme == .dark ? 0.45 : 0.30
+                )
+                .offset(x: orbDrift ? 120 : -120, y: 260)
             }
             .ignoresSafeArea()
             .allowsHitTesting(false)
@@ -102,7 +100,8 @@ struct HomeView: View {
         )
     }
 
-    private func orb(color: Color, size: CGFloat, alignment: Alignment, opacity: Double) -> some View {
+    private func orb(color: Color, size: CGFloat, opacity: Double) -> some View {
+        // Radial gradient is already soft — no extra blur needed.
         RadialGradient(
             colors: [color.opacity(opacity), color.opacity(0)],
             center: .center,
@@ -110,8 +109,6 @@ struct HomeView: View {
             endRadius: size / 2
         )
         .frame(width: size, height: size)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
-        .blur(radius: 40)
     }
 
     private var brandStack: some View {
@@ -139,7 +136,7 @@ struct HomeView: View {
                 .shadow(
                     color: Color(red: 0.35, green: 0.30, blue: 0.80)
                         .opacity(colorScheme == .dark ? 0.55 : 0.28),
-                    radius: 28, x: 0, y: 14
+                    radius: 18, x: 0, y: 10
                 )
 
             VStack(spacing: 8) {
