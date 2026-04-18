@@ -149,11 +149,11 @@ struct HomeView: View {
             Button {
                 openedDocument = OpenedDocument(text: "", sourceURL: nil)
             } label: {
-                secondaryLabel(icon: "square.and.pencil", title: "Create")
+                whiteLabel(icon: "square.and.pencil", title: "Create")
             }
             .buttonStyle(PressScaleStyle())
 
-            // Tertiary — Welcome tour (white card)
+            // Secondary — Welcome tour
             Button {
                 openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
             } label: {
@@ -161,26 +161,6 @@ struct HomeView: View {
             }
             .buttonStyle(PressScaleStyle())
         }
-    }
-
-    private func secondaryLabel(icon: String, title: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
-            Text(title)
-                .font(.system(size: 18, weight: .semibold))
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 56)
-        .foregroundStyle(.primary)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.regularMaterial)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
-        )
     }
 
     private func whiteLabel(icon: String, title: String) -> some View {
@@ -215,8 +195,8 @@ struct HomeView: View {
         Link(destination: URL(string: "https://santiagoalonso.com")!) {
             Text("Made by santiagoalonso.com")
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.white.opacity(0.5))
         }
+        .tint(.primary.opacity(0.5))
     }
 
     // MARK: - Welcome template
