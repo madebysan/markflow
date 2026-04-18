@@ -5,6 +5,8 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var showFileImporter = false
     @State private var openedDocument: OpenedDocument?
+    @State private var didAnimateIn = false
+    @State private var orbDrift = false
 
     private let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
 
@@ -13,19 +15,53 @@ struct HomeView: View {
             backgroundGradient
                 .ignoresSafeArea()
 
+            // Animated ambient orbs
+            GeometryReader { proxy in
+                ZStack {
+                    orb(
+                        color: Color(red: 0.56, green: 0.42, blue: 0.95),
+                        size: proxy.size.width * 0.85,
+                        alignment: orbDrift ? .topLeading : .topTrailing,
+                        opacity: colorScheme == .dark ? 0.55 : 0.40
+                    )
+                    orb(
+                        color: Color(red: 0.40, green: 0.58, blue: 1.00),
+                        size: proxy.size.width * 0.75,
+                        alignment: orbDrift ? .bottomTrailing : .bottomLeading,
+                        opacity: colorScheme == .dark ? 0.45 : 0.30
+                    )
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
+            }
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+
             VStack(spacing: 0) {
                 Spacer(minLength: 40)
 
                 brandStack
+                    .opacity(didAnimateIn ? 1 : 0)
+                    .offset(y: didAnimateIn ? 0 : 14)
 
                 Spacer()
 
                 actionStack
                     .padding(.horizontal, 24)
+                    .opacity(didAnimateIn ? 1 : 0)
+                    .offset(y: didAnimateIn ? 0 : 18)
 
                 credit
                     .padding(.top, 28)
                     .padding(.bottom, 32)
+                    .opacity(didAnimateIn ? 1 : 0)
+            }
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.7)) {
+                didAnimateIn = true
+            }
+            withAnimation(.easeInOut(duration: 14).repeatForever(autoreverses: true)) {
+                orbDrift.toggle()
             }
         }
         .fileImporter(
@@ -52,16 +88,28 @@ struct HomeView: View {
         LinearGradient(
             colors: colorScheme == .dark
                 ? [
-                    Color(red: 0.08, green: 0.06, blue: 0.18),
-                    Color(red: 0.14, green: 0.09, blue: 0.26)
+                    Color(red: 0.06, green: 0.04, blue: 0.14),
+                    Color(red: 0.12, green: 0.07, blue: 0.22)
                 ]
                 : [
-                    Color(red: 0.93, green: 0.94, blue: 1.00),
-                    Color(red: 0.87, green: 0.84, blue: 1.00)
+                    Color(red: 0.95, green: 0.96, blue: 1.00),
+                    Color(red: 0.89, green: 0.86, blue: 1.00)
                 ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    private func orb(color: Color, size: CGFloat, alignment: Alignment, opacity: Double) -> some View {
+        RadialGradient(
+            colors: [color.opacity(opacity), color.opacity(0)],
+            center: .center,
+            startRadius: 0,
+            endRadius: size / 2
+        )
+        .frame(width: size, height: size)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+        .blur(radius: 40)
     }
 
     private var brandStack: some View {
@@ -72,6 +120,20 @@ struct HomeView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 128, height: 128)
                 .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(colorScheme == .dark ? 0.25 : 0.6),
+                                    Color.white.opacity(0)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
                 .shadow(
                     color: Color(red: 0.35, green: 0.30, blue: 0.80)
                         .opacity(colorScheme == .dark ? 0.55 : 0.28),
@@ -116,10 +178,11 @@ struct HomeView: View {
                     radius: 18, x: 0, y: 10
                 )
             }
+            .buttonStyle(PressScaleStyle())
 
             // Secondary — Create
             Button {
-                openedDocument = OpenedDocument(text: "", sourceURL: nil)
+                openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "square.and.pencil")
@@ -139,6 +202,7 @@ struct HomeView: View {
                         .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
                 )
             }
+            .buttonStyle(PressScaleStyle())
         }
     }
 
@@ -166,6 +230,16 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Welcome template
+
+    private static func welcomeTemplate() -> String {
+        if let url = Bundle.main.url(forResource: "welcome", withExtension: "md"),
+           let text = try? String(contentsOf: url, encoding: .utf8) {
+            return text
+        }
+        return "# Welcome\n\nStart writing…"
+    }
+
     // MARK: - Opening files
 
     private func open(url: URL) {
@@ -179,6 +253,17 @@ struct HomeView: View {
         } catch {
             print("Markflow: failed to read \(url.lastPathComponent): \(error)")
         }
+    }
+}
+
+// MARK: - Press-state button style
+
+private struct PressScaleStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .animation(.spring(response: 0.28, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
 

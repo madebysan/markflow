@@ -16,6 +16,7 @@
 		4FB2791CD85D2E0947812398 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6B86A64108045E28EE7DE /* EditView.swift */; };
 		5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
+		82E44933A76399EF81171A06 /* welcome.md in Resources */ = {isa = PBXBuildFile; fileRef = 36FF6F883E08456B1A6C45B9 /* welcome.md */; };
 		915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */; };
 		A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
 		E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC466180FA15E44EBC9BBF8 /* HomeView.swift */; };
@@ -25,6 +26,7 @@
 		0C50858AC1E06350E38CB309 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0FC466180FA15E44EBC9BBF8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github-dark.css"; sourceTree = "<group>"; };
+		36FF6F883E08456B1A6C45B9 /* welcome.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = welcome.md; sourceTree = "<group>"; };
 		4B561E95D4411E64ACD65FFA /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
 		8C4279291B38384200DC0ED7 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
 		91C4B697C05D869057F0987D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -59,6 +61,7 @@
 				9BD63FB0C10885B6AC27B18C /* marked.min.js */,
 				8C4279291B38384200DC0ED7 /* mermaid.min.js */,
 				4B561E95D4411E64ACD65FFA /* preview.html */,
+				36FF6F883E08456B1A6C45B9 /* welcome.md */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -158,6 +161,7 @@
 				2D376B69B6BB2D3479C0E888 /* marked.min.js in Resources */,
 				27645E6618F39052A6EA5112 /* mermaid.min.js in Resources */,
 				1C38B4F36231910110F7A914 /* preview.html in Resources */,
+				82E44933A76399EF81171A06 /* welcome.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

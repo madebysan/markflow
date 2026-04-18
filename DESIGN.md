@@ -64,6 +64,24 @@ These align with iOS system colors.
 
 ## Patterns
 
+### Markdown toolbar (Edit mode)
+
+Keyboard-accessory bar, 44pt tall, `.systemChromeMaterial` blur, 0.5pt hairline divider at top. Buttons are 38×36pt SF Symbols (`pointSize: 16, weight: .medium`), tinted `.label`, with 1pt-wide separator bars between logical groups (headings / emphasis / link+image / lists / blocks). Horizontally scrollable. Right-pinned keyboard-dismiss button. Light haptic (`UIImpactFeedbackGenerator .light`) fires on every action.
+
+Action semantics:
+
+- **Wrap** commands (bold/italic/strikethrough/inline code) — wrap selection with prefix/suffix, or insert `prefix + placeholder + suffix` with placeholder pre-selected when nothing is selected.
+- **Line-prefix** commands (headings, lists, quote) — inserted at the start of the current line. Second tap on the same prefix toggles it off.
+- **Link / image** — `[text](https://)` / `![text](https://)` with `https://` pre-selected so the user types over it.
+
+### Ambient orbs (Home)
+
+Two radial gradients (brand purple + periwinkle), 75–85% of screen width, 40pt blur, slowly drifting between opposite corners on a 14s ease-in-out autoreverse loop. Non-interactive (`allowsHitTesting(false)`). Gives the home screen depth without visible motion on casual glance.
+
+### Entrance animation (Home)
+
+Brand stack + action stack fade in (`opacity 0→1`) with a 14–18pt slide-up, 0.7s easeOut, on first appear. Credit link fades in alongside.
+
 ### Primary CTA
 
 Full-width gradient button, 56pt tall, 18pt corner radius, brand gradient fill, white text + icon (18pt semibold), tinted drop shadow matching brand gradient. Used for: Browse (main Markflow action). Signals: "do this — it's the point of the app."
@@ -90,7 +108,8 @@ Segmented `Picker` in the nav bar's principal slot, 180pt fixed width, `.segment
 - `DocumentContainer` — private wrapper inside HomeView.swift, provides NavigationStack + toolbar title
 - `DocumentView` — document reader/editor root (`Markflow/Views/DocumentView.swift`)
 - `PreviewView` — `UIViewRepresentable` wrapping WKWebView (`Markflow/Views/PreviewView.swift`)
-- `EditView` — `TextEditor` with magnification gesture (`Markflow/Views/EditView.swift`)
+- `EditView` — `UITextView` wrapper with markdown toolbar + magnification gesture (`Markflow/Views/EditView.swift`)
+- `MarkdownToolbarView` — UIKit `inputAccessoryView` with SF Symbol buttons and haptic feedback (private in EditView.swift)
 - `OpenedDocument` — model struct: `id`, `text`, `sourceURL?` (defined in HomeView.swift)
 
 ## Decisions
