@@ -44,7 +44,7 @@ These align with iOS system colors.
 - **Brand title** — 42pt bold, tracking -0.8, SF Pro
 - **Tagline** — 17pt regular, line-height ~1.2, `.primary.opacity(0.72)` for contrast
 - **Button label** — 18pt semibold
-- **Credit** — 13pt medium, 55% / 80% primary opacity (split for "Made by" / link)
+- **Credit** — 13pt medium, `.primary.opacity(0.5)` (adapts: near-black in light mode, near-white in dark). `.tint` on the `Link` is pinned to the same value so iOS's accent color doesn't bleed through.
 - **Preview body** — 17pt `-apple-system`, line-height 1.5
 - **Preview headings** — 28/22/19pt bold (H1/H2/H3)
 - **Preview code** — 14–15pt SF Mono / Menlo
@@ -74,21 +74,17 @@ Action semantics:
 - **Line-prefix** commands (headings, lists, quote) — inserted at the start of the current line. Second tap on the same prefix toggles it off.
 - **Link / image** — `[text](https://)` / `![text](https://)` with `https://` pre-selected so the user types over it.
 
-### Ambient orbs (Home)
-
-Two radial gradients (brand purple + periwinkle), 75–85% of screen width, 40pt blur, slowly drifting between opposite corners on a 14s ease-in-out autoreverse loop. Non-interactive (`allowsHitTesting(false)`). Gives the home screen depth without visible motion on casual glance.
-
 ### Entrance animation (Home)
 
-Brand stack + action stack fade in (`opacity 0→1`) with a 14–18pt slide-up, 0.7s easeOut, on first appear. Credit link fades in alongside.
+Brand stack + action stack fade in (`opacity 0→1`) with a 14–18pt slide-up, 0.5s easeOut, on first appear. Credit link fades in alongside. No repeating animations on home — static `LinearGradient` background only.
 
 ### Primary CTA
 
 Full-width gradient button, 56pt tall, 18pt corner radius, brand gradient fill, white text + icon (18pt semibold), tinted drop shadow matching brand gradient. Used for: Browse (main Markflow action). Signals: "do this — it's the point of the app."
 
-### Secondary CTA
+### Secondary CTA (white card)
 
-Full-width material button, 56pt tall, 18pt corner radius, `.regularMaterial` fill, 12% primary stroke, primary-color text + icon (same weight as primary). Used for: Create. Signals: "available but less frequent."
+Full-width solid-white button, 56pt tall, 18pt corner radius, `Color.white` fill, soft black 8% drop shadow (10pt blur, y:4), black text + icon. Used for: Create and Welcome to Markflow. Both secondary CTAs share the identical `whiteLabel(icon:title:)` helper — different icons and labels, same surface. Signals: "available action, less prominent than Browse." Works equally in light and dark mode.
 
 ### Nav bar items (iOS 26)
 
@@ -128,15 +124,23 @@ Save errors surface via a separate `.alert`. Security-scoped access to the sourc
 - **Read-only by default, explicit export only.** (2026-04-17) Markdown files often belong to someone else — silently overwriting the source on edit is wrong. Edits live in memory, Share sheet exports a copy.
 - **Custom home replaces DocumentGroup launch browser.** (2026-04-17) Markflow is a reader; Browse should be primary, not Create. DocumentGroup's default order is wrong for this app.
 - **WKWebView + vendored JS for preview, not native AttributedString.** (2026-04-17) Only path to rendering inline images, tables, mermaid diagrams. Native markdown APIs don't support any of these.
-- **Mermaid diagrams included despite 3 MB cost.** (2026-04-17) Real documents lean on flowcharts. Losing them would be worse than the binary size hit.
+- **Mermaid diagrams included despite 3 MB cost — but lazy-loaded.** (2026-04-18) Real documents lean on flowcharts; losing them would be worse than the binary size hit. Fetching only when a ` ```mermaid ` block is present keeps first-render fast for the 95% of files that don't need diagrams.
 - **iOS 26 target (not 17 or 18).** (2026-04-17) New install, no legacy users, lets us use Liquid Glass toolbar styling for free.
 - **iPhone only, no iPad.** (2026-04-17) Keeps layout simple for v0. Universal target can be a v1 move.
 - **Close chevron, not "Done" text.** (2026-04-17) iOS 26 pattern; chevron reads as "back to home" better than modal-dismiss wording.
+- **Two button styles on home, not three.** (2026-04-18) Tried gradient + material + white — read as "three different buttons" rather than a hierarchy. Collapsed to gradient (Browse) + white card (Create, Welcome). Three CTAs, two visual treatments.
+- **No ambient orbs, no repeating animations.** (2026-04-18) Animated radial gradients behind `.regularMaterial` buttons forced the GPU to re-blur every frame — `WebProcessProxy::didBecomeUnresponsive` caliber slow. Static `LinearGradient` background is enough; entrance animation is one-shot.
+- **WebKit prewarm on app launch.** (2026-04-18) `WebViewPrewarmer.shared.prewarm()` in `MarkflowApp.init()` spawns WKWebView's WebContent/GPU/Networking processes in the background (~2–3s each) so first document open doesn't pay the cold-start tax.
+- **Content-Security-Policy on preview.** (2026-04-18) User-authored `.md` can contain raw HTML that marked passes through. CSP `script-src 'self'; connect-src 'none'` blocks any injected script from executing or exfiltrating. Required extracting init JS from inline to `preview.js`.
 
 ## Anti-patterns (don't repeat)
 
 - **Don't put segmented Picker in DocumentGroup's `.principal` toolbar slot.** DocumentGroup owns that slot for the document title — the picker was invisible or unresponsive. Either move out of DocumentGroup (done) or use a different placement.
-- **Don't set WKWebView `baseURL` to the source document's parent directory.** Vendored scripts (marked.js, mermaid.js, highlight.js) load relative to baseURL — passing the document's dir makes them 404. Always use the bundle preview dir.
+- **Don't set WKWebView `baseURL` to the source document's parent directory.** Vendored scripts (marked.js, mermaid.js, highlight.js) load relative to baseURL — passing the document's dir makes them 404. Always use the bundle preview dir (or prefer `loadFileURL(_:allowingReadAccessTo:)`).
 - **Don't use `.ignoresSafeArea(.keyboard, edges: .bottom)` on text editors.** That modifier lets the keyboard *cover* the text. The default (respecting the keyboard) is what you want.
 - **Don't use DocumentGroup for a reader-first app.** Its "Create" primary CTA, its save-on-every-edit behavior, and its insistence on principal toolbar ownership all fight a reader's UX.
 - **Don't rely on AppleScript taps for iOS Simulator UI automation.** Causes rotation issues and unreliable coordinates. For verification, screenshot the launch screen and trust the code for inner views.
+- **Don't put `.regularMaterial` buttons over animated content.** Material blur re-samples the background every frame — if there's an animation running behind it, you're paying a full offscreen-render per tick. Either solid fills or a static background. (2026-04-18 — animated orbs behind two material buttons made the home screen felt unresponsive.)
+- **Don't eagerly load all rendering dependencies upfront.** Mermaid.js at 3 MB was loading on every preview whether it was needed or not; WebContent process stayed unresponsive until parsing finished. Lazy-load heavy libraries on first use of their feature.
+- **Don't compute `ShareLink(item: ...)` via a function with side effects.** `ShareLink(item: exportedFileURL())` where `exportedFileURL()` writes a temp file = one disk write per SwiftUI body render = one disk write per keystroke in Edit. Use `Transferable` (`FileRepresentation`) so the file is written only when the share is actually invoked.
+- **Don't use `UIScreen.main.bounds` for view sizing in iOS 26.** Deprecated. For `inputAccessoryView`, UIKit auto-sizes to the keyboard width anyway — just set height in `intrinsicContentSize`.
