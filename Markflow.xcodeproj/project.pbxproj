@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,7 @@
 		27645E6618F39052A6EA5112 /* mermaid.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C4279291B38384200DC0ED7 /* mermaid.min.js */; };
 		2D376B69B6BB2D3479C0E888 /* marked.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BD63FB0C10885B6AC27B18C /* marked.min.js */; };
 		395F6F4C5714EA9A32868686 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */; };
+		4913E3E042BE5D79D4A2E21E /* WebViewPrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */; };
 		4FB2791CD85D2E0947812398 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6B86A64108045E28EE7DE /* EditView.swift */; };
 		5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
@@ -26,6 +27,7 @@
 		0C50858AC1E06350E38CB309 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		0FC466180FA15E44EBC9BBF8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github-dark.css"; sourceTree = "<group>"; };
+		1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPrewarmer.swift; sourceTree = "<group>"; };
 		36FF6F883E08456B1A6C45B9 /* welcome.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = welcome.md; sourceTree = "<group>"; };
 		4B561E95D4411E64ACD65FFA /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
 		8C4279291B38384200DC0ED7 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
@@ -35,7 +37,7 @@
 		B5A3CDF1D48F9F8AF284318C /* highlight.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
 		B96448590D3A726722BFA597 /* MarkflowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkflowApp.swift; sourceTree = "<group>"; };
 		BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
-		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		CE6818521117AE0878C221A4 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -48,6 +50,7 @@
 				A1F6B86A64108045E28EE7DE /* EditView.swift */,
 				0FC466180FA15E44EBC9BBF8 /* HomeView.swift */,
 				C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */,
+				1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -122,9 +125,10 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					150E906E66BA51522CED860C = {
+						DevelopmentTeam = 3KBA253B3F;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -139,6 +143,7 @@
 			);
 			mainGroup = D0AFB2DC75B4708C6CCE3FA3;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -175,6 +180,7 @@
 				E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */,
 				7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */,
 				395F6F4C5714EA9A32868686 /* PreviewView.swift in Sources */,
+				4913E3E042BE5D79D4A2E21E /* WebViewPrewarmer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,7 +247,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -255,7 +260,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -276,7 +280,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -344,7 +347,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
