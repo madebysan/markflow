@@ -5,6 +5,7 @@ struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var showFileImporter = false
     @State private var openedDocument: OpenedDocument?
+    @State private var accessURL: URL?
     @State private var didAnimateIn = false
     @State private var orbDrift = false
 
@@ -74,6 +75,7 @@ struct HomeView: View {
         }
         .fullScreenCover(item: $openedDocument) { doc in
             DocumentContainer(openedDocument: doc) {
+                releaseAccess()
                 openedDocument = nil
             }
         }
@@ -243,15 +245,27 @@ struct HomeView: View {
     // MARK: - Opening files
 
     private func open(url: URL) {
+        // Release any prior access before claiming a new one.
+        releaseAccess()
         let didAccess = url.startAccessingSecurityScopedResource()
-        defer {
-            if didAccess { url.stopAccessingSecurityScopedResource() }
-        }
         do {
             let text = try String(contentsOf: url, encoding: .utf8)
             openedDocument = OpenedDocument(text: text, sourceURL: url)
+            // Keep access alive until the document view closes so Save can
+            // write back to the original file.
+            if didAccess {
+                accessURL = url
+            }
         } catch {
+            if didAccess { url.stopAccessingSecurityScopedResource() }
             print("Markflow: failed to read \(url.lastPathComponent): \(error)")
+        }
+    }
+
+    private func releaseAccess() {
+        if let url = accessURL {
+            url.stopAccessingSecurityScopedResource()
+            accessURL = nil
         }
     }
 }

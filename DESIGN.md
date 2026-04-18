@@ -100,7 +100,18 @@ Segmented `Picker` in the nav bar's principal slot, 180pt fixed width, `.segment
 
 ### Share / Export
 
-`ShareLink` in `.topBarTrailing` with a temp-file URL built on-demand from the current working text. Export filename derived from source (`<base>-edited.md`). Disabled when `workingText` is empty (e.g., new blank document with nothing typed).
+`ShareLink` in `.topBarTrailing` with a temp-file URL built on-demand from the current working text. Export filename derived from source (`<base>-edited.md`). Disabled when `workingText` is empty (e.g., new blank document with nothing typed). Lives alongside Save — Share is for quick ad-hoc "send a copy anywhere" (including iOS's built-in "Save to Files"), Save is for committing the edit back to the original document on exit.
+
+### Unsaved-changes confirmation
+
+Triggered when the back chevron is tapped with `workingText != documentText`. Uses `.confirmationDialog` with these actions:
+
+- **Save** — overwrites the source file. Only offered when `sourceURL != nil` (files opened from share sheet or Files). Dismisses the document on success.
+- **Save as New File…** — presents `.fileExporter` with `MarkdownFileDocument`. Default filename is `<source-base>-copy` or `Untitled` for new documents. Dismisses on success; `NSUserCancelledError` on cancel is silently ignored.
+- **Discard Changes** — destructive, red. Drops edits and returns to home.
+- **Cancel** — stays in the editor.
+
+Save errors surface via a separate `.alert`. Security-scoped access to the source URL is held for the entire document session (started in `HomeView.open`, released in `onClose`) so Save can write back without re-requesting permission.
 
 ## Shared components
 
