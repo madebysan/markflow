@@ -220,16 +220,10 @@ struct HomeView: View {
     }
 
     private var credit: some View {
-        Link(destination: URL(string: "https://santiagoalonso.com")!) {
-            HStack(spacing: 4) {
-                Text("Made by")
-                    .foregroundStyle(.primary.opacity(0.55))
-                Text("santiagoalonso.com")
-                    .foregroundStyle(.primary.opacity(0.80))
-                    .underline()
-            }
+        Text("Made by [san](https://santiagoalonso.com)")
             .font(.system(size: 13, weight: .medium))
-        }
+            .foregroundStyle(.white.opacity(0.5))
+            .tint(.white.opacity(0.5))
     }
 
     // MARK: - Welcome template
