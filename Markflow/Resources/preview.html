@@ -162,7 +162,7 @@ th { background: var(--code-bg); font-weight: 600; }
 
 <script src="marked.min.js"></script>
 <script src="highlight.min.js"></script>
-<script src="mermaid.min.js"></script>
+<!-- mermaid.min.js (~3 MB) is loaded lazily — only when a ```mermaid block is present. -->
 </head>
 <body>
 <div id="content"><div id="empty">Empty document</div></div>
@@ -177,13 +177,34 @@ th { background: var(--code-bg); font-weight: 600; }
   applyHljsTheme();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
 
-  // Configure mermaid — don't auto-start, we'll run it manually
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
-    securityLevel: 'loose',
-    flowchart: { htmlLabels: true, curve: 'basis' }
-  });
+  // Mermaid is loaded on-demand only when a ```mermaid block is present.
+  let mermaidLoader = null;
+  function ensureMermaid() {
+    if (window.mermaid) return Promise.resolve();
+    if (mermaidLoader) return mermaidLoader;
+    mermaidLoader = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'mermaid.min.js';
+      s.async = true;
+      s.onload = () => {
+        try {
+          window.mermaid.initialize({
+            startOnLoad: false,
+            theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+            securityLevel: 'loose',
+            flowchart: { htmlLabels: true, curve: 'basis' }
+          });
+        } catch (e) { console.error('mermaid init failed:', e); }
+        resolve();
+      };
+      s.onerror = () => {
+        mermaidLoader = null;
+        reject(new Error('mermaid.min.js failed to load'));
+      };
+      document.head.appendChild(s);
+    });
+    return mermaidLoader;
+  }
 
   // Custom marked renderer — emit mermaid blocks as <pre class="mermaid">
   // so mermaid's run() picks them up, and skip hljs for them.
@@ -234,16 +255,15 @@ th { background: var(--code-bg); font-weight: 600; }
         try { hljs.highlightElement(block); } catch (e) {}
       });
 
-      // Render mermaid diagrams — assign unique ids and run
+      // Render mermaid diagrams — lazy-load the library on first use
       const mermaidBlocks = el.querySelectorAll('pre.mermaid');
       if (mermaidBlocks.length > 0) {
-        mermaidBlocks.forEach((b) => {
-          b.id = 'mermaid-' + (++mermaidCounter);
-          // mermaid.run expects elements to be class="mermaid" divs or pre;
-          // keeps the raw text, renders SVG in place
-        });
         try {
-          await mermaid.run({ nodes: mermaidBlocks });
+          await ensureMermaid();
+          mermaidBlocks.forEach((b) => {
+            b.id = 'mermaid-' + (++mermaidCounter);
+          });
+          await window.mermaid.run({ nodes: mermaidBlocks });
         } catch (e) {
           console.error('mermaid error:', e);
         }

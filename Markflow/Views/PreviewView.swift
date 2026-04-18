@@ -43,17 +43,14 @@ struct PreviewView: UIViewRepresentable {
         guard let url = Bundle.main.url(forResource: "preview", withExtension: "html") else {
             return
         }
-        // Always use the bundle's preview.html directory as baseURL so the
-        // vendored marked.js / highlight.js / mermaid.js load from the same
-        // folder. Known v0 limitation: relative image paths in the user's
-        // markdown won't resolve — users need absolute URLs for images.
-        let resolvedBase = url.deletingLastPathComponent()
-        do {
-            let html = try String(contentsOf: url, encoding: .utf8)
-            webView.loadHTMLString(html, baseURL: resolvedBase)
-        } catch {
-            webView.load(URLRequest(url: url))
-        }
+        // loadFileURL explicitly grants WebKit read access to the Resources
+        // folder — this is the iOS-recommended way to load bundled HTML with
+        // sibling JS/CSS files and avoids the sandbox-extension errors that
+        // loadHTMLString(baseURL:) can hit on device.
+        // Known v0 limitation: relative image paths in the user's markdown
+        // won't resolve — users need absolute URLs for images.
+        let resourcesDir = url.deletingLastPathComponent()
+        webView.loadFileURL(url, allowingReadAccessTo: resourcesDir)
     }
 
     private func render(markdown: String, in webView: WKWebView) {
