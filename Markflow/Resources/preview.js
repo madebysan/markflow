@@ -75,7 +75,7 @@
   window.render = async function(md) {
     const el = document.getElementById('content');
     if (!md || md.length === 0) {
-      el.innerHTML = '<div id="empty">Empty document</div>';
+      el.innerHTML = '<div id="empty">Nothing here yet — tap Edit to start.</div>';
       return;
     }
     try {

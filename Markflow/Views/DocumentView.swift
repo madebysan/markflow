@@ -30,7 +30,7 @@ struct DocumentView: View {
             .onAppear(perform: initializeOnFirstAppear)
             .toolbar { toolbarContent }
             .confirmationDialog(
-                "You have unsaved changes",
+                "Unsaved changes",
                 isPresented: $showExitConfirmation,
                 titleVisibility: .visible
             ) {
@@ -133,7 +133,7 @@ struct DocumentView: View {
 
     private var exitConfirmationMessage: String {
         sourceURL != nil
-            ? "Save overwrites the original file. Save as New File keeps the original untouched."
+            ? "“Save” writes over the original. “Save as New File” keeps the original untouched."
             : "Pick a location to save your new markdown file, or discard your work."
     }
 
@@ -171,7 +171,7 @@ struct DocumentView: View {
         } catch {
             saveAlert = SaveAlert(
                 title: "Couldn't save",
-                message: error.localizedDescription
+                message: "\(error.localizedDescription)\n\nTry again, or use “Save as New File” to pick a different location."
             )
         }
     }
@@ -185,7 +185,7 @@ struct DocumentView: View {
             if nsError.code == NSUserCancelledError { return }
             saveAlert = SaveAlert(
                 title: "Couldn't save",
-                message: error.localizedDescription
+                message: "\(error.localizedDescription)\n\nTry again, or pick a different location."
             )
         }
     }
