@@ -13,13 +13,6 @@ DerivedData/
 .build/
 Package.resolved
 
-# v0-swift session detritus
-.v0-swift/
-checkpoint.json
-
 # Local session notes (not pushed)
 plan.md
-BUILD_REPORT.md
-
-# Stale project stub (renamed to Markflow)
-MDReader.xcodeproj/
+checkpoint.json
