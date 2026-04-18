@@ -7,7 +7,6 @@ struct HomeView: View {
     @State private var openedDocument: OpenedDocument?
     @State private var accessURL: URL?
     @State private var didAnimateIn = false
-    @State private var orbDrift = false
 
     private let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
 
@@ -15,25 +14,6 @@ struct HomeView: View {
         ZStack {
             backgroundGradient
                 .ignoresSafeArea()
-
-            // Ambient orbs — transform-based drift (GPU only, no layout pass).
-            ZStack {
-                orb(
-                    color: Color(red: 0.56, green: 0.42, blue: 0.95),
-                    size: 360,
-                    opacity: colorScheme == .dark ? 0.55 : 0.40
-                )
-                .offset(x: orbDrift ? -100 : 100, y: -240)
-
-                orb(
-                    color: Color(red: 0.40, green: 0.58, blue: 1.00),
-                    size: 320,
-                    opacity: colorScheme == .dark ? 0.45 : 0.30
-                )
-                .offset(x: orbDrift ? 120 : -120, y: 260)
-            }
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
 
             VStack(spacing: 0) {
                 Spacer(minLength: 40)
@@ -56,11 +36,8 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 0.7)) {
+            withAnimation(.easeOut(duration: 0.5)) {
                 didAnimateIn = true
-            }
-            withAnimation(.easeInOut(duration: 14).repeatForever(autoreverses: true)) {
-                orbDrift.toggle()
             }
         }
         .fileImporter(
@@ -98,17 +75,6 @@ struct HomeView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    private func orb(color: Color, size: CGFloat, opacity: Double) -> some View {
-        // Radial gradient is already soft — no extra blur needed.
-        RadialGradient(
-            colors: [color.opacity(opacity), color.opacity(0)],
-            center: .center,
-            startRadius: 0,
-            endRadius: size / 2
-        )
-        .frame(width: size, height: size)
     }
 
     private var brandStack: some View {
@@ -187,11 +153,11 @@ struct HomeView: View {
             }
             .buttonStyle(PressScaleStyle())
 
-            // Tertiary — Welcome tour
+            // Tertiary — Welcome tour (white card)
             Button {
                 openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
             } label: {
-                secondaryLabel(icon: "sparkles", title: "Welcome to Markflow")
+                whiteLabel(icon: "sparkles", title: "Welcome to Markflow")
             }
             .buttonStyle(PressScaleStyle())
         }
@@ -215,6 +181,23 @@ struct HomeView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
         )
+    }
+
+    private func whiteLabel(icon: String, title: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .medium))
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 56)
+        .foregroundStyle(.black)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color.white)
+        )
+        .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
     }
 
     private var primaryGradient: LinearGradient {
