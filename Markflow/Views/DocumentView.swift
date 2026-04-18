@@ -57,6 +57,9 @@ struct DocumentView: View {
         .onAppear {
             if !didInit {
                 workingText = documentText
+                if documentText.isEmpty {
+                    mode = .edit
+                }
                 didInit = true
             }
         }

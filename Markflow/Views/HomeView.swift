@@ -51,8 +51,12 @@ struct HomeView: View {
                     .opacity(didAnimateIn ? 1 : 0)
                     .offset(y: didAnimateIn ? 0 : 18)
 
+                tourLink
+                    .padding(.top, 20)
+                    .opacity(didAnimateIn ? 1 : 0)
+
                 credit
-                    .padding(.top, 28)
+                    .padding(.top, 14)
                     .padding(.bottom, 32)
                     .opacity(didAnimateIn ? 1 : 0)
             }
@@ -184,7 +188,7 @@ struct HomeView: View {
 
             // Secondary — Create
             Button {
-                openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
+                openedDocument = OpenedDocument(text: "", sourceURL: nil)
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "square.and.pencil")
@@ -219,11 +223,26 @@ struct HomeView: View {
         )
     }
 
-    private var credit: some View {
-        Text("Made by [san](https://santiagoalonso.com)")
+    private var tourLink: some View {
+        Button {
+            openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
+        } label: {
+            HStack(spacing: 4) {
+                Text("Take the tour")
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+            }
             .font(.system(size: 13, weight: .medium))
             .foregroundStyle(.white.opacity(0.5))
-            .tint(.white.opacity(0.5))
+        }
+    }
+
+    private var credit: some View {
+        Link(destination: URL(string: "https://santiagoalonso.com")!) {
+            Text("Made by santiagoalonso.com")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.white.opacity(0.5))
+        }
     }
 
     // MARK: - Welcome template
