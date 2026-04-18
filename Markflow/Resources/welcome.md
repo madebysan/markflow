@@ -45,9 +45,13 @@ Inline `code` sits nicely between words.
 
 Visit [santiagoalonso.com](https://santiagoalonso.com) for more.
 
-![A calm desk with a notebook](https://images.unsplash.com/photo-1517842645767-c639042777db?w=1200&q=80)
+Images use this syntax — paste an absolute URL and Markflow will fetch it when you preview:
 
-> Use absolute URLs for images — relative paths aren't supported yet.
+```markdown
+![Alt text](https://example.com/photo.jpg)
+```
+
+> Relative paths (`./photo.png`) aren't supported yet — use absolute URLs.
 
 ## Blockquote
 
