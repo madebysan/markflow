@@ -51,12 +51,8 @@ struct HomeView: View {
                     .opacity(didAnimateIn ? 1 : 0)
                     .offset(y: didAnimateIn ? 0 : 18)
 
-                tourLink
-                    .padding(.top, 20)
-                    .opacity(didAnimateIn ? 1 : 0)
-
                 credit
-                    .padding(.top, 14)
+                    .padding(.top, 24)
                     .padding(.bottom, 32)
                     .opacity(didAnimateIn ? 1 : 0)
             }
@@ -190,26 +186,38 @@ struct HomeView: View {
             Button {
                 openedDocument = OpenedDocument(text: "", sourceURL: nil)
             } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "square.and.pencil")
-                        .font(.system(size: 18, weight: .medium))
-                    Text("Create")
-                        .font(.system(size: 18, weight: .semibold))
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .foregroundStyle(.primary)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(.regularMaterial)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
-                )
+                secondaryLabel(icon: "square.and.pencil", title: "Create")
+            }
+            .buttonStyle(PressScaleStyle())
+
+            // Tertiary — Welcome tour
+            Button {
+                openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
+            } label: {
+                secondaryLabel(icon: "sparkles", title: "Welcome to Markflow")
             }
             .buttonStyle(PressScaleStyle())
         }
+    }
+
+    private func secondaryLabel(icon: String, title: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .medium))
+            Text(title)
+                .font(.system(size: 18, weight: .semibold))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 56)
+        .foregroundStyle(.primary)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(.regularMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
+        )
     }
 
     private var primaryGradient: LinearGradient {
@@ -221,20 +229,6 @@ struct HomeView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    private var tourLink: some View {
-        Button {
-            openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
-        } label: {
-            HStack(spacing: 4) {
-                Text("Take the tour")
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-            }
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(.white.opacity(0.5))
-        }
     }
 
     private var credit: some View {
