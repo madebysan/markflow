@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -37,7 +37,7 @@
 		B5A3CDF1D48F9F8AF284318C /* highlight.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
 		B96448590D3A726722BFA597 /* MarkflowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkflowApp.swift; sourceTree = "<group>"; };
 		BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
-		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		CE6818521117AE0878C221A4 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -128,7 +128,6 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					150E906E66BA51522CED860C = {
-						DevelopmentTeam = 3KBA253B3F;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -143,7 +142,6 @@
 			);
 			mainGroup = D0AFB2DC75B4708C6CCE3FA3;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -260,6 +258,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -280,6 +279,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QAMM2A6WRQ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
