@@ -234,7 +234,8 @@ private final class MarkdownToolbarView: UIView {
 
     private func setup() {
         autoresizingMask = [.flexibleWidth]
-        frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 44)
+        // inputAccessoryView gets auto-sized to the keyboard width; only height matters here.
+        frame = CGRect(x: 0, y: 0, width: 0, height: 44)
 
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
         blur.translatesAutoresizingMaskIntoConstraints = false
