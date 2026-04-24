@@ -15,12 +15,15 @@ Markflow — Markdown Reader
 
 ## Subtitle (30 char max)
 
-**Pick one:**
+```
+Open .md files anywhere
+```
+23 / 30 ← submitted 0.1.0 (2)
 
-- `Markdown reader for iOS` — 23 / 30 ← recommended
-- `Open .md files anywhere` — 23 / 30
+**Rejected subtitle from 0.1.0 (1):** `Markdown reader for iOS` — Apple 5.2.5 rejection (trademark). Do not use "iOS", "iPhone", "iPad", or "Mac" in subtitles.
+
+**Alternates (also safe):**
 - `Read and edit markdown` — 22 / 30
-- `Native markdown for iPhone` — 26 / 30
 
 ## Promotional text (170 char max, editable without new build)
 
@@ -32,7 +35,7 @@ A native reader and editor for .md files. Open from anywhere, render with code b
 ## Description (4000 char max)
 
 ```
-The iOS reader markdown was missing.
+The markdown reader you've been missing.
 
 Markflow opens .md files from Files, Mail, Safari downloads, or the share sheet and renders them properly — GitHub-flavored markdown, syntax-highlighted code, mermaid diagrams, tables, task lists, and more.
 
@@ -42,11 +45,11 @@ Originals are never touched. Edits live in memory until you explicitly Save, Sav
 WHAT YOU CAN DO
 
 • Open any .md, .markdown, or .mdown file from any app
-• Read with a clean, native iOS preview
+• Read with a clean, native preview
 • Edit with a markdown toolbar above the keyboard — bold, italic, headings, lists, links, images, code, quotes, all one tap away
 • Pinch to zoom in both Preview and Edit
 • Export an edited copy via the system share sheet
-• Tap Create to start a new file with a full markdown tour template
+• Tap Create to start a new blank file, or "Welcome to Markflow" for a full feature tour
 
 
 WHAT IT RENDERS
@@ -68,7 +71,7 @@ Your files stay on your device.
 
 DESIGN
 
-Built native for iOS with SwiftUI and the iOS 26 Liquid Glass nav bar. Light and dark mode. Adaptive home screen. Stock Apple Human Interface Guidelines throughout.
+Built native with SwiftUI and the Liquid Glass nav bar. Light and dark mode. Adaptive home screen. Stock Apple Human Interface Guidelines throughout.
 
 
 WHO IT'S FOR
@@ -116,9 +119,11 @@ markdown,md,reader,editor,notes,writing,readme,docs,text,mermaid
 
 ## URLs
 
-- **Support URL:** `https://github.com/madebysan/markflow/issues`
+- **Support URL:** `https://github.com/madebysan/markflow/blob/main/docs/support.md`
 - **Marketing URL:** `https://santiagoalonso.com`
 - **Privacy Policy URL:** `https://github.com/madebysan/markflow/blob/main/docs/privacy-policy.md`
+
+**Rejected Support URL from 0.1.0 (1):** `https://github.com/madebysan/markflow/issues` — Apple 1.5 rejection (dev issue tracker, not user-facing support).
 
 ## App Privacy (nutrition label)
 
@@ -139,9 +144,9 @@ Markflow is a markdown reader and editor for .md files.
 No login, no network, no permissions. The app reads files you open via Files / Mail / share sheet and renders them locally in a sandboxed WKWebView.
 
 To test:
-1. Tap "Create" on the home screen — a welcome.md template loads with the full markdown tour (headings, code blocks, mermaid diagrams, tables).
-2. Or tap "Browse" and pick any .md file from the Files app.
-3. Use the Preview/Edit segmented picker in the nav bar to switch modes.
+1. Tap "Welcome to Markflow" on the home screen — a full markdown tour loads (headings, code blocks, mermaid diagrams, tables). Use the Preview/Edit picker in the nav bar to switch modes.
+2. Tap "Create" to start a new blank document with a starter heading. Opens in Preview mode; tap Edit to write.
+3. Tap "Browse" to pick any .md file from the Files app.
 4. The share button in the nav bar exports an edited copy.
 
 The vendored mermaid.min.js (3 MB) renders diagrams locally — no remote code execution. CSP is locked to script-src 'self'.
@@ -153,12 +158,14 @@ The vendored mermaid.min.js (3 MB) renders diagrams locally — no remote code e
 
 ## Build
 
-- 0.1.0 (build 1)
+- 0.1.0 (build 2) — resubmission after 0.1.0 (1) rejection
 
----
+## Changes in 0.1.0 (2) — resubmission notes
 
-## Open decisions for san
+Addresses all three issues from Apple's 4/24/2026 review of 0.1.0 (1):
 
-1. **Subtitle pick** — recommend `Markdown reader for iOS`. It's the most search-friendly.
-2. **Description length** — current ~1,800 char draft is tight and scannable. Could expand to 3,000+ if you want more hooks (e.g., "Why I built Markflow" paragraph).
-3. **App preview video** — optional, not in scope for v0.1.0. Skip.
+1. **5.2.5 Legal: Intellectual Property (trademark)** — Subtitle changed from `Markdown reader for iOS` to `Open .md files anywhere`. Home-screen tagline changed from "The iOS reader markdown was missing" to "The markdown reader you've been missing". All other "iOS" references removed from description.
+
+2. **2.1 Performance: App Completeness (blank page bug)** — On iPad Air 11" M3, tapping Create showed a blank page. Root cause: Create passed an empty string to DocumentView which auto-switched to Edit mode; UITextView with no content and no auto-focused keyboard rendered as blank. Fix: Create now loads a minimal starter template (`# Untitled\n\nStart writing your markdown here.`) so Preview mode immediately shows visible rendered content.
+
+3. **1.5 Safety: Developer Information (Support URL)** — Replaced `github.com/madebysan/markflow/issues` (dev-facing issue tracker) with a user-facing support page that has FAQ, how-to-get-help, and a contact email.

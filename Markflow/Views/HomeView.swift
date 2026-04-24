@@ -111,7 +111,7 @@ struct HomeView: View {
                     .tracking(-0.8)
                     .foregroundStyle(.primary)
 
-                Text("The iOS reader markdown\nwas missing.")
+                Text("The markdown reader\nyou've been missing.")
                     .font(.system(size: 17, weight: .regular))
                     .foregroundStyle(.primary.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -147,7 +147,7 @@ struct HomeView: View {
 
             // Secondary — Create
             Button {
-                openedDocument = OpenedDocument(text: "", sourceURL: nil)
+                openedDocument = OpenedDocument(text: Self.newDocumentTemplate(), sourceURL: nil)
             } label: {
                 whiteLabel(icon: "square.and.pencil", title: "Create")
             }
@@ -207,6 +207,15 @@ struct HomeView: View {
             return text
         }
         return "# Welcome\n\nStart writing…"
+    }
+
+    private static func newDocumentTemplate() -> String {
+        """
+        # Untitled
+
+        Start writing your markdown here.
+
+        """
     }
 
     // MARK: - Opening files
