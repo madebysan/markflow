@@ -5,6 +5,35 @@ Updated every session via `/save-session`.
 
 ---
 
+## 2026-04-24 (session 4)
+
+### App Store resubmission
+
+- **0.1.0 (2) uploaded and submitted for review** after Apple rejected 0.1.0 (1) on three guidelines. Build accepted into ASC; status: Waiting for Review.
+
+### Fixes (rejection response)
+
+- **5.2.5 trademark** — Subtitle `Markdown reader for iOS` → `Open .md files anywhere`. Home-screen tagline `"The iOS reader markdown was missing."` → `"The markdown reader you've been missing."`. Description cleaned of three other "iOS" marketing references (opener, "native iOS preview" bullet, "iOS 26 Liquid Glass nav bar" line).
+- **2.1 blank-page bug** — `HomeView.swift`: Create button now calls `Self.newDocumentTemplate()` instead of passing `""`. Starter content (`# Untitled\n\nStart writing your markdown here.\n`) makes Preview mode render visible content on first appear, fixing the iPad Air 11" blank-canvas rejection. Verified on device by san.
+- **1.5 Support URL** — Created `docs/support.md` with FAQ + `hi@santiagoalonso.com` contact. Swapped ASC Support URL from the GitHub issues tracker to `https://github.com/madebysan/markflow/blob/main/docs/support.md`.
+
+### Metadata
+
+- **ASC metadata updated live** — subtitle, description, Support URL, and App Review Notes all rewritten in App Store Connect. Reviewer Notes now lead with a `RESUBMISSION: 0.1.0 (2)` block calling out each fix so the reviewer can verify without re-reading the whole note.
+- **`docs/app-store/metadata.md` synced** — spaced em-dashes removed from the description to match what was actually pasted into ASC. File now reflects live listing state for any future rebuild.
+- **README tagline + Support section updated** — tagline matches the in-app tagline, Support section points at `docs/support.md` (GitHub issues kept as secondary path for public bug reports).
+
+### Build infrastructure
+
+- **Build number bumped** — `CURRENT_PROJECT_VERSION` 1 → 2 in `project.yml`, regenerated via xcodegen. Marketing version stays at `0.1.0`.
+- **Release IPA** — fresh archive + export at `build/export/Markflow.ipa` (2.9 MB, Apple Distribution cert under team `QAMM2A6WRQ`, entitlement `application-identifier = QAMM2A6WRQ.com.san.markflow`).
+
+### Status: resubmitted to App Store, awaiting review
+
+Auto-release on approval. Two commits (`032defb`, `17585d5`) pushed to `main`.
+
+---
+
 ## 2026-04-23 (session 3)
 
 ### App Store submission
