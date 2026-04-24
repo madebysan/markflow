@@ -7,9 +7,11 @@ Paste-ready copy for App Store Connect submission. Character limits noted.
 ## App name (30 char max)
 
 ```
-Markflow
+Markflow — Markdown Reader
 ```
-8 / 30
+26 / 30
+
+(Registered. The shorter `Markflow` was already taken on the App Store.)
 
 ## Subtitle (30 char max)
 
