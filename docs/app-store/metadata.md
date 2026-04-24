@@ -37,7 +37,7 @@ A native reader and editor for .md files. Open from anywhere, render with code b
 ```
 The markdown reader you've been missing.
 
-Markflow opens .md files from Files, Mail, Safari downloads, or the share sheet and renders them properly — GitHub-flavored markdown, syntax-highlighted code, mermaid diagrams, tables, task lists, and more.
+Markflow opens .md files from Files, Mail, Safari downloads, or the share sheet and renders them properly. GitHub-flavored markdown, syntax-highlighted code, mermaid diagrams, tables, task lists, and more.
 
 Originals are never touched. Edits live in memory until you explicitly Save, Save as New File, or Share a copy.
 
@@ -46,7 +46,7 @@ WHAT YOU CAN DO
 
 • Open any .md, .markdown, or .mdown file from any app
 • Read with a clean, native preview
-• Edit with a markdown toolbar above the keyboard — bold, italic, headings, lists, links, images, code, quotes, all one tap away
+• Edit with a markdown toolbar above the keyboard. Bold, italic, headings, lists, links, images, code, quotes, all one tap away.
 • Pinch to zoom in both Preview and Edit
 • Export an edited copy via the system share sheet
 • Tap Create to start a new blank file, or "Welcome to Markflow" for a full feature tour
@@ -139,17 +139,29 @@ No further checkboxes required. Skip the entire data-collection grid.
 - **Notes to reviewer:**
 
 ```
+RESUBMISSION: 0.1.0 (2)
+
+This build addresses all three issues from the 4/24/2026 rejection of 0.1.0 (1):
+
+1. 5.2.5 Trademark: Subtitle changed from "Markdown reader for iOS" to "Open .md files anywhere". Home-screen tagline and description also cleaned of "iOS" references.
+
+2. 2.1 App Completeness (blank page on Create). Root cause: Create passed an empty string to the document view, which entered Edit mode with no content and no auto-shown keyboard, rendering as blank on iPad. Fix: Create now loads a visible starter template ("# Untitled" + short paragraph) so Preview mode shows rendered content on first appear.
+
+3. 1.5 Support URL: Replaced GitHub issues tracker URL with a user-facing support page at github.com/madebysan/markflow/blob/main/docs/support.md (FAQ + contact email).
+
+---
+
 Markflow is a markdown reader and editor for .md files.
 
-No login, no network, no permissions. The app reads files you open via Files / Mail / share sheet and renders them locally in a sandboxed WKWebView.
+No login, no network, no permissions. The app reads files you open via Files, Mail, or the share sheet and renders them locally in a sandboxed WKWebView.
 
 To test:
-1. Tap "Welcome to Markflow" on the home screen — a full markdown tour loads (headings, code blocks, mermaid diagrams, tables). Use the Preview/Edit picker in the nav bar to switch modes.
+1. Tap "Welcome to Markflow" on the home screen. A full markdown tour loads (headings, code blocks, mermaid diagrams, tables). Use the Preview/Edit picker in the nav bar to switch modes.
 2. Tap "Create" to start a new blank document with a starter heading. Opens in Preview mode; tap Edit to write.
 3. Tap "Browse" to pick any .md file from the Files app.
 4. The share button in the nav bar exports an edited copy.
 
-The vendored mermaid.min.js (3 MB) renders diagrams locally — no remote code execution. CSP is locked to script-src 'self'.
+The vendored mermaid.min.js (3 MB) renders diagrams locally. No remote code execution. CSP is locked to script-src 'self'.
 ```
 
 ## Version Release
