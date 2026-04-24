@@ -5,6 +5,28 @@ Updated every session via `/save-session`.
 
 ---
 
+## 2026-04-23 (session 3)
+
+### App Store submission
+
+- **Markflow v0.1.0 submitted to the App Store** — listed as `Markflow — Markdown Reader` (the shorter `Markflow` was taken). Awaiting Apple review.
+- **App Store Connect listing complete** — paste-ready metadata at `docs/app-store/metadata.md`: subtitle "Markdown reader for iOS", Productivity primary / Utilities secondary category, age rating 4+, privacy declaration "Data Not Collected", auto-release on approval.
+- **Screenshots captured** — 5 iPhone 17 Pro Max shots (1320×2868, `docs/app-store/screenshots/6.9-inch/`) and 5 iPad Pro 13" shots (2064×2752, `docs/app-store/screenshots/13-inch-ipad/`).
+- **Privacy policy** — `docs/privacy-policy.md` published; URL points at the file in the public GitHub repo.
+
+### Build infrastructure
+
+- **Team ID corrected** — `project.yml` `DEVELOPMENT_TEAM` switched from `3KBA253B3F` (free personal team) to `QAMM2A6WRQ` (paid Apple Developer Program team that owns the Apple Distribution cert). Apple Distribution signing only works under the paid team.
+- **Export compliance** — `ITSAppUsesNonExemptEncryption: false` added to `Info.plist`. Skips the encryption form on every future submission.
+- **App icon flattened** — `icon-1024.png` had an alpha channel that Apple rejects. ImageMagick composited onto a flat blue→purple gradient (`#83ABF7 → #7869E4`) and stripped alpha.
+- **Release archive shipped** — `xcodebuild archive -allowProvisioningUpdates` + `xcodebuild -exportArchive`, IPA delivered via Transporter (entitlement `application-identifier = QAMM2A6WRQ.com.san.markflow`).
+
+### Status: submitted to App Store, awaiting review
+
+Auto-release on approval. No further action required from us until Apple emails back.
+
+---
+
 ## 2026-04-18 (session 2)
 
 ### Security
