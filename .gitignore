@@ -15,5 +15,6 @@ Package.resolved
 
 # Local session notes (not pushed)
 plan.md
+plan-*.md
 backlog.md
 checkpoint.json
