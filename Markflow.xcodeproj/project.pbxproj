@@ -8,35 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		03662B17E01E8878C35E4F1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91C4B697C05D869057F0987D /* Assets.xcassets */; };
-		1885900C62CBC698FB8317DF /* MacPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267EE7F450F0A35091F8A810 /* MacPreviewView.swift */; };
 		1ADE8FAF71612F864FEE8ECE /* highlight-github-dark.css in Resources */ = {isa = PBXBuildFile; fileRef = 1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */; };
 		1C38B4F36231910110F7A914 /* preview.html in Resources */ = {isa = PBXBuildFile; fileRef = 4B561E95D4411E64ACD65FFA /* preview.html */; };
 		27645E6618F39052A6EA5112 /* mermaid.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C4279291B38384200DC0ED7 /* mermaid.min.js */; };
 		2D376B69B6BB2D3479C0E888 /* marked.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BD63FB0C10885B6AC27B18C /* marked.min.js */; };
-		33EE2F20FE25FBB646DE2D32 /* highlight-github-dark.css in Resources */ = {isa = PBXBuildFile; fileRef = 1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */; };
 		395F6F4C5714EA9A32868686 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */; };
-		3B10C88811E7B27777F58FA8 /* MarkflowMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3789BB74074C85ADD7672620 /* MarkflowMacApp.swift */; };
-		44552247E6F7F79737CAF2D9 /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
 		4913E3E042BE5D79D4A2E21E /* WebViewPrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */; };
 		4FB2791CD85D2E0947812398 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6B86A64108045E28EE7DE /* EditView.swift */; };
-		52699979767D8594FA2073F1 /* EditorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F6E341C9B08B764E466F6E7 /* EditorState.swift */; };
 		5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
-		67943C5718FD787747867ED8 /* FolderSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 262FF59D8E3627183C1DC24A /* FolderSidebarView.swift */; };
-		6F4EFACC5E4AD9657A05BFB4 /* preview.html in Resources */ = {isa = PBXBuildFile; fileRef = 4B561E95D4411E64ACD65FFA /* preview.html */; };
-		7D6AA87103BB483BB10E2BE5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 597DD4CA2E72447F9848649C /* Assets.xcassets */; };
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
 		82E44933A76399EF81171A06 /* welcome.md in Resources */ = {isa = PBXBuildFile; fileRef = 36FF6F883E08456B1A6C45B9 /* welcome.md */; };
 		915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */; };
-		98EE6F1223123174CDDF177A /* preview.js in Resources */ = {isa = PBXBuildFile; fileRef = E5DC9E1E126C7B4CC6F8D12F /* preview.js */; };
 		A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
-		A2F7E9AE9FE4F53DBC91A9AF /* FolderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE170F94CC83AC428B4C8BC /* FolderModel.swift */; };
-		B70369F9A78B4E373A002A16 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC20249A8ED3D10913C5610B /* MainWindowView.swift */; };
-		C1DA8AFC531FED7DAA65053A /* marked.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 9BD63FB0C10885B6AC27B18C /* marked.min.js */; };
-		C3A8F7D1A187E6B984F0BC8C /* mermaid.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 8C4279291B38384200DC0ED7 /* mermaid.min.js */; };
-		CCE096D5FAB36121253391BC /* MacEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9729D2AC51300B2FE6A06A3 /* MacEditView.swift */; };
-		CDD062BE58FCD8568B8B7133 /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
 		DC71C81B77135BE7BAE92D5D /* preview.js in Resources */ = {isa = PBXBuildFile; fileRef = E5DC9E1E126C7B4CC6F8D12F /* preview.js */; };
-		E417FA9188B86EF60C4C7E5A /* welcome.md in Resources */ = {isa = PBXBuildFile; fileRef = 36FF6F883E08456B1A6C45B9 /* welcome.md */; };
 		E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC466180FA15E44EBC9BBF8 /* HomeView.swift */; };
 /* End PBXBuildFile section */
 
@@ -45,30 +29,19 @@
 		0FC466180FA15E44EBC9BBF8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github-dark.css"; sourceTree = "<group>"; };
 		1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPrewarmer.swift; sourceTree = "<group>"; };
-		262FF59D8E3627183C1DC24A /* FolderSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSidebarView.swift; sourceTree = "<group>"; };
-		267EE7F450F0A35091F8A810 /* MacPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacPreviewView.swift; sourceTree = "<group>"; };
 		36FF6F883E08456B1A6C45B9 /* welcome.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = welcome.md; sourceTree = "<group>"; };
-		3789BB74074C85ADD7672620 /* MarkflowMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkflowMacApp.swift; sourceTree = "<group>"; };
 		4B561E95D4411E64ACD65FFA /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
-		4F6E341C9B08B764E466F6E7 /* EditorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorState.swift; sourceTree = "<group>"; };
-		597DD4CA2E72447F9848649C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		5EE170F94CC83AC428B4C8BC /* FolderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderModel.swift; sourceTree = "<group>"; };
 		8C4279291B38384200DC0ED7 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
 		91C4B697C05D869057F0987D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9834CA752D311F566A98E978 /* MarkflowMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarkflowMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BD63FB0C10885B6AC27B18C /* marked.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = marked.min.js; sourceTree = "<group>"; };
 		A1F6B86A64108045E28EE7DE /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
-		A477C62D2E94EF04D6D7F8AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B5A3CDF1D48F9F8AF284318C /* highlight.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = highlight.min.js; sourceTree = "<group>"; };
 		B96448590D3A726722BFA597 /* MarkflowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkflowApp.swift; sourceTree = "<group>"; };
-		BC20249A8ED3D10913C5610B /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowView.swift; sourceTree = "<group>"; };
 		BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		CE6818521117AE0878C221A4 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
 		E5DC9E1E126C7B4CC6F8D12F /* preview.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = preview.js; sourceTree = "<group>"; };
-		E9729D2AC51300B2FE6A06A3 /* MacEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacEditView.swift; sourceTree = "<group>"; };
-		EF4F2A81B18256692E848F51 /* Markflow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Markflow.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -82,15 +55,6 @@
 				1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		505E0E646ABEB3D8A9B43DE1 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				4F6E341C9B08B764E466F6E7 /* EditorState.swift */,
-				5EE170F94CC83AC428B4C8BC /* FolderModel.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		5E84B632DF95956E659CCA61 /* Resources */ = {
@@ -124,42 +88,16 @@
 			isa = PBXGroup;
 			children = (
 				C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */,
-				9834CA752D311F566A98E978 /* MarkflowMac.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		C0F2AD0501C33D82BF7F31BD /* MarkflowMac */ = {
-			isa = PBXGroup;
-			children = (
-				597DD4CA2E72447F9848649C /* Assets.xcassets */,
-				A477C62D2E94EF04D6D7F8AB /* Info.plist */,
-				EF4F2A81B18256692E848F51 /* Markflow.entitlements */,
-				3789BB74074C85ADD7672620 /* MarkflowMacApp.swift */,
-				505E0E646ABEB3D8A9B43DE1 /* Models */,
-				DC3B461F2905B6A6E9FCB599 /* Views */,
-			);
-			path = MarkflowMac;
 			sourceTree = "<group>";
 		};
 		D0AFB2DC75B4708C6CCE3FA3 = {
 			isa = PBXGroup;
 			children = (
 				A2660238DDB336B206C22771 /* Markflow */,
-				C0F2AD0501C33D82BF7F31BD /* MarkflowMac */,
 				B7B2A318FC58BE6BA870DC45 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		DC3B461F2905B6A6E9FCB599 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				262FF59D8E3627183C1DC24A /* FolderSidebarView.swift */,
-				E9729D2AC51300B2FE6A06A3 /* MacEditView.swift */,
-				267EE7F450F0A35091F8A810 /* MacPreviewView.swift */,
-				BC20249A8ED3D10913C5610B /* MainWindowView.swift */,
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,24 +121,6 @@
 			productReference = C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7A0549A2818280250F606A51 /* MarkflowMac */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 13C90DACD54E74AC8B9D48E2 /* Build configuration list for PBXNativeTarget "MarkflowMac" */;
-			buildPhases = (
-				63C327E04FDAD87D0E5DEF06 /* Sources */,
-				29D7E831E895109DF6DF3239 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = MarkflowMac;
-			packageProductDependencies = (
-			);
-			productName = MarkflowMac;
-			productReference = 9834CA752D311F566A98E978 /* MarkflowMac.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -211,10 +131,6 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					150E906E66BA51522CED860C = {
-						DevelopmentTeam = QAMM2A6WRQ;
-						ProvisioningStyle = Automatic;
-					};
-					7A0549A2818280250F606A51 = {
 						DevelopmentTeam = QAMM2A6WRQ;
 						ProvisioningStyle = Automatic;
 					};
@@ -235,28 +151,11 @@
 			projectRoot = "";
 			targets = (
 				150E906E66BA51522CED860C /* Markflow */,
-				7A0549A2818280250F606A51 /* MarkflowMac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		29D7E831E895109DF6DF3239 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7D6AA87103BB483BB10E2BE5 /* Assets.xcassets in Resources */,
-				33EE2F20FE25FBB646DE2D32 /* highlight-github-dark.css in Resources */,
-				44552247E6F7F79737CAF2D9 /* highlight-github.css in Resources */,
-				CDD062BE58FCD8568B8B7133 /* highlight.min.js in Resources */,
-				C1DA8AFC531FED7DAA65053A /* marked.min.js in Resources */,
-				C3A8F7D1A187E6B984F0BC8C /* mermaid.min.js in Resources */,
-				6F4EFACC5E4AD9657A05BFB4 /* preview.html in Resources */,
-				98EE6F1223123174CDDF177A /* preview.js in Resources */,
-				E417FA9188B86EF60C4C7E5A /* welcome.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		86A27C9F49B7A7EB0CCF770A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -276,20 +175,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		63C327E04FDAD87D0E5DEF06 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				52699979767D8594FA2073F1 /* EditorState.swift in Sources */,
-				A2F7E9AE9FE4F53DBC91A9AF /* FolderModel.swift in Sources */,
-				67943C5718FD787747867ED8 /* FolderSidebarView.swift in Sources */,
-				CCE096D5FAB36121253391BC /* MacEditView.swift in Sources */,
-				1885900C62CBC698FB8317DF /* MacPreviewView.swift in Sources */,
-				B70369F9A78B4E373A002A16 /* MainWindowView.swift in Sources */,
-				3B10C88811E7B27777F58FA8 /* MarkflowMacApp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		F70D41FAFDA72CDA0D6AACE6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -361,14 +246,15 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -388,7 +274,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.san.markflow;
 				PRODUCT_NAME = Markflow;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -408,7 +294,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.san.markflow;
 				PRODUCT_NAME = Markflow;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -461,55 +347,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		CFD4822641634F596699A6C5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MarkflowMac/Markflow.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = MarkflowMac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.san.markflow.mac;
-				PRODUCT_NAME = Markflow;
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		D096AC14D1CE38AA54C94565 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MarkflowMac/Markflow.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = MarkflowMac/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.san.markflow.mac;
-				PRODUCT_NAME = Markflow;
-				SDKROOT = macosx;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -521,15 +366,6 @@
 			buildConfigurations = (
 				5AC59CD9CBFF1AACCD470D1D /* Debug */,
 				6E6D252C4969A052D8D13B8F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		13C90DACD54E74AC8B9D48E2 /* Build configuration list for PBXNativeTarget "MarkflowMac" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				CFD4822641634F596699A6C5 /* Debug */,
-				D096AC14D1CE38AA54C94565 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
