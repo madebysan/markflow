@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="Markflow/Assets.xcassets/AppIcon.appiconset/icon-1024.png" width="128" height="128" alt="Markflow icon">
+  <img src="docs/icon.png" width="128" height="128" alt="Markflow icon">
 </p>
 <h1 align="center">Markflow</h1>
 <p align="center">Simple on-the-go markdown reader and editor for iOS.</p>
