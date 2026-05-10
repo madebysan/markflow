@@ -3,12 +3,17 @@ import UniformTypeIdentifiers
 
 struct HomeView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @AppStorage(AppPreferences.themeIDKey) private var themeID: String = AppThemeCatalog.defaultID
     @State private var showFileImporter = false
     @State private var openedDocument: OpenedDocument?
     @State private var accessURL: URL?
     @State private var didAnimateIn = false
     @State private var showSettings = false
     @State private var recents = RecentsStore.shared
+
+    private var themeColor: Color {
+        AppThemeCatalog.theme(for: themeID).accentColor
+    }
 
     private let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
     private static let relativeFormatter: RelativeDateTimeFormatter = {
@@ -142,8 +147,7 @@ struct HomeView: View {
                         )
                 )
                 .shadow(
-                    color: Color(red: 0.35, green: 0.30, blue: 0.80)
-                        .opacity(colorScheme == .dark ? 0.55 : 0.28),
+                    color: themeColor.opacity(colorScheme == .dark ? 0.45 : 0.25),
                     radius: 18, x: 0, y: 10
                 )
 
@@ -177,11 +181,10 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .foregroundStyle(.white)
-                .background(primaryGradient)
+                .background(themeColor)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .shadow(
-                    color: Color(red: 0.42, green: 0.38, blue: 0.92)
-                        .opacity(colorScheme == .dark ? 0.65 : 0.45),
+                    color: themeColor.opacity(colorScheme == .dark ? 0.55 : 0.4),
                     radius: 18, x: 0, y: 10
                 )
             }
@@ -292,17 +295,6 @@ struct HomeView: View {
                 .fill(Color.white)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
-    }
-
-    private var primaryGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color(red: 0.46, green: 0.50, blue: 0.95),
-                Color(red: 0.56, green: 0.42, blue: 0.95)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
     }
 
     private var credit: some View {

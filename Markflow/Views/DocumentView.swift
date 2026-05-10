@@ -20,6 +20,7 @@ struct DocumentView: View {
     @State private var showRenameAlert: Bool = false
     @State private var renameInput: String = ""
     @State private var saveAlert: SaveAlert?
+    @State private var showSettings: Bool = false
 
     @State private var swipeOffset: CGFloat = 0
     private let edgeThreshold: CGFloat = 24
@@ -85,6 +86,9 @@ struct DocumentView: View {
             } message: { alert in
                 Text(alert.message)
             }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
     }
 
     // MARK: - Body fragments
@@ -129,12 +133,19 @@ struct DocumentView: View {
                 ) {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
+
+                Divider()
+
+                Button {
+                    showSettings = true
+                } label: {
+                    Label("Settings", systemImage: "gearshape")
+                }
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .font(.system(size: 17, weight: .semibold))
             }
             .accessibilityLabel("More options")
-            .disabled(workingText.isEmpty)
         }
     }
 
