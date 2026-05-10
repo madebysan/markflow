@@ -72,7 +72,10 @@ struct EditView: View {
             let cleanName = (suggestedName?.replacingOccurrences(of: " ", with: "-"))
                 .flatMap { $0.isEmpty ? nil : $0 }
             let ref = try ImageStore.save(image: image, suggestedName: cleanName)
-            let alt = suggestedName ?? ""
+            // Escape brackets in alt text — they'd break ![alt](url) parsing.
+            let alt = (suggestedName ?? "")
+                .replacingOccurrences(of: "[", with: "")
+                .replacingOccurrences(of: "]", with: "")
             bridge.insertImageMarkdown?(ref, alt)
         } catch {
             pickerError = error.localizedDescription

@@ -2,6 +2,7 @@
   // Swap highlight.js theme based on color scheme
   function applyHljsTheme() {
     const link = document.getElementById('hljs-theme');
+    if (!link) return;
     const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     link.href = dark ? 'highlight-github-dark.css' : 'highlight-github.css';
   }

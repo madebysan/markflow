@@ -5,6 +5,44 @@ Updated every session via `/save-session`.
 
 ---
 
+## 2026-05-10 (session 5) — v0.2.0
+
+User feedback round driven by a fan letter listing 4 issues + 2 feature requests; expanded into a broader UX pass while we were in the codebase. `MARKETING_VERSION` 0.1.0 → 0.2.0, `CURRENT_PROJECT_VERSION` 2 → 5.
+
+### New features
+
+- **Theme system** — 5 curated themes (Indigo, Forest, Sunset, Ocean, Graphite), each with separate light + dark hex values. `AppThemeCatalog` in `AccentColor.swift`, `accentColor` resolves per `userInterfaceStyle` via `UIColor` `dynamicProvider`. Replaces the free-form `ColorPicker` from an earlier draft.
+- **Appearance preference** — System / Light / Dark switcher in Settings. `AppearancePreference` enum, applied via `.preferredColorScheme()` at WindowGroup root + on the SettingsView root (sheets cache env, so live switching needs the preference applied locally too).
+- **Document font picker (6 options)** — System (SF Pro), Rounded (SF Pro Rounded, rebuilt with `preferredFontDescriptor.withDesign(.rounded)` so substitution actually takes), Charter (bundled iOS reading serif), Monospace (SF Mono), iA Writer (iA Writer Quattro S, open source SIL OFL, ~240 KB), JetBrains (JetBrains Mono, open source OFL, ~544 KB). Custom NavigationLink picker so each row renders in its own font (default `Picker` discards per-row `.font()`). Applies to both editor (`UIFont`) and preview (CSS via `setFontPreferences` JS).
+- **Font size sliders** — Editor (12–24pt, syncs with pinch-to-zoom) + Preview (12–24pt, separate). CSS `--body-font-size` injected via JS.
+- **Recents on Home** — Last 4 opened files via `RecentsStore.shared`, security-scoped bookmark `Data` persisted in UserDefaults, stale entries pruned on resolve failure. Welcome to Markflow button auto-hides when recents exist. Clear-recents button in Settings (with confirmation).
+- **Image picker** — `PHPickerSheet` (no photo-library permission needed). Saves to `Documents/images/UUID-name.{jpg,png}`. PNG when image has alpha, JPEG q=0.9 otherwise. Inserts `![alt](images/UUID-name.ext)`. On Save / Save As, sibling images are copied to `<.md location>/images/` so other markdown apps resolve the relative paths.
+- **Filename in nav bar + Options menu** — Centered title (editable via Rename). Top-trailing `Menu`: Rename → file system move, Save to Files → existing fileExporter, Share → existing ShareLink, Export as PDF → off-screen WKWebView + `createPDF`, Settings → opens SettingsView sheet from within doc.
+- **Export as PDF** — `PDFExporter.swift`. Off-screen WKWebView (US Letter 612×792pt), reuses preview pipeline with selected font + size, renders via existing `render()` JS, posts a `renderDone` `WKScriptMessage` when complete (Promise chained), then `createPDF` writes to temp + presents share sheet via `IdentifiableURL` + `ShareSheet` `UIActivityViewController` wrapper.
+- **Floating glass nav at bottom** — Single-icon toggle: pencil in Preview (tap to edit), eye in Edit (tap to preview). 48pt circle with `.ultraThinMaterial`, iOS 17+ `.symbolEffect(.replace)` swap animation. Used `.overlay(alignment: .bottom)` instead of `.safeAreaInset` so it doesn't reserve vertical space.
+- **Floating Liquid Glass editor toolbar** — `inputAccessoryView` capsule with system blur, larger touch targets (40pt), padded from screen edges, capsule corner radius. Replaces the old edge-to-edge bar.
+- **Interactive swipe-back gesture** — DragGesture (.simultaneousGesture, `.global` coordinate space) that requires origin x < 24pt. Document follows finger via `.offset(x:)`, snaps back if translation < 90pt, calls `attemptClose()` past threshold.
+- **New file mode preference** — Edit / Preview default for newly-created docs. Existing files always open in Preview.
+
+### Fixes
+
+- **2.1 image-picker dismiss bug** — `PHPickerViewControllerDelegate` was calling `picker.dismiss(animated:)`, which under SwiftUI's `.sheet`-inside-`.fullScreenCover` cascades and dismisses the parent document. Removed; SwiftUI now dismisses via the `showImagePicker` binding.
+- **2.2 preview JS string escaping** — `imageBasePath` and `setFontPreferences` were double-quoted (`jsonString` already wraps in `"..."`, the template added another `\"...\"`). Resulted in invalid JS, silently failed. Both image rendering and font CSS were broken until this fix.
+- **2.3 hide-keyboard button no-op** — `inputAccessoryView`'s `self.window` is the keyboard's `UIInputWindow`, so `.endEditing(true)` did nothing. Switched to `UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder)...)` walking the responder chain.
+- **2.4 theme tint not propagating to inner pickers** — `.tint()` only on NavigationStack didn't reach pushed Picker sub-lists. Added `.tint(themeColor)` directly on the Form too. Browse button + brand glow on Home now read from `AppThemeCatalog.theme(for: themeID)` instead of hardcoded purple gradient.
+
+### Infrastructure
+
+- **PreviewAssets relocation** — `Documents/preview/` now mirrors all preview assets (preview.html, preview.js, marked, highlight, mermaid, CSS) on launch when bundle build version changes. Required because WKWebView's `loadFileURL(allowingReadAccessTo:)` only accepts one root, and we need read scope to cover both preview HTML and user-saved images under Documents.
+- **Bundled fonts** — `Markflow/Resources/fonts/` ships iA Writer Quattro S (Regular + Bold) and JetBrains Mono (Regular + Bold), all SIL OFL. Registered in `Info.plist` `UIAppFonts`. Also mirrored to `Documents/preview/` with `@font-face` declarations in `preview.html` for WebKit consumption.
+- **Build infrastructure** — `CURRENT_PROJECT_VERSION` 2 → 5 over the session (3, 4, 5 to force PreviewAssets re-mirror after preview.html / fonts changes).
+
+### Code organization
+
+- New files: `AccentColor.swift` (theme/font/appearance/file-mode enums + HexColor helper), `RecentsStore.swift` (`@Observable` singleton + bookmark mgmt), `ImageStore.swift` (PNG/JPEG save with UUID prefix), `PreviewAssets.swift` (asset mirror), `PDFExporter.swift` (off-screen WKWebView + WKScriptMessageHandler), `Views/SettingsView.swift`, `Views/ImagePickerSheet.swift`, `Views/ShareSheet.swift` (UIActivityViewController wrapper + `IdentifiableURL`).
+
+---
+
 ## 2026-04-24 (session 4)
 
 ### App Store resubmission

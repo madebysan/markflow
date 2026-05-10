@@ -327,7 +327,12 @@ struct HomeView: View {
     // MARK: - Opening files
 
     private func open(url: URL) {
-        // Release any prior access before claiming a new one.
+        // Guard re-entry: rapid taps (e.g. recent + onOpenURL race) could
+        // orphan a startAccessingSecurityScopedResource by claiming a new
+        // URL while the previous fullScreenCover is still presenting.
+        guard openedDocument == nil else { return }
+
+        // Release any prior access before claiming a new one (defensive).
         releaseAccess()
         let didAccess = url.startAccessingSecurityScopedResource()
         do {
