@@ -70,6 +70,14 @@
 
   marked.use({ renderer, breaks: true, gfm: true });
 
+  // Called from Swift to apply user's font preferences before rendering.
+  window.setFontPreferences = function(family, stretch, sizePx) {
+    const root = document.documentElement.style;
+    if (family) root.setProperty('--body-font', family);
+    if (stretch) root.setProperty('--body-font-stretch', stretch);
+    if (sizePx) root.setProperty('--body-font-size', sizePx + 'px');
+  };
+
   // Rewrite relative <img src> paths to absolute file:// URLs scoped to
   // window.imageBasePath (set from Swift). Leaves absolute URLs alone.
   function rewriteImageSources(root) {

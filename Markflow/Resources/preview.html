@@ -30,6 +30,9 @@
   --link: #007aff;
   --checkbox-border: #c7c7cc;
   --checkbox-checked: #34c759;
+  --body-font: -apple-system, "SF Pro Text", BlinkMacSystemFont, sans-serif;
+  --body-font-stretch: normal;
+  --body-font-size: 17px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -48,7 +51,10 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--fg);
-  font: 17px/1.5 -apple-system, "SF Pro Text", BlinkMacSystemFont, sans-serif;
+  font-family: var(--body-font);
+  font-size: var(--body-font-size);
+  line-height: 1.5;
+  font-stretch: var(--body-font-stretch);
   -webkit-text-size-adjust: 100%;
 }
 #content {

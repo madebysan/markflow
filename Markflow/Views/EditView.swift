@@ -8,7 +8,8 @@ final class EditorBridge {
 struct EditView: View {
     @Binding var text: String
 
-    @AppStorage("editFontSize") private var fontSize: Double = 16
+    @AppStorage(AppPreferences.editorFontSizeKey) private var fontSize: Double = 16
+    @AppStorage(AppPreferences.documentFontKey) private var fontRaw: String = DocumentFont.mono.rawValue
     @State private var gestureStartSize: Double = 16
     @State private var isPinching: Bool = false
     @State private var bridge = EditorBridge()
@@ -18,10 +19,15 @@ struct EditView: View {
     private let minFont: Double = 10
     private let maxFont: Double = 36
 
+    private var font: DocumentFont {
+        DocumentFont(rawValue: fontRaw) ?? .mono
+    }
+
     var body: some View {
         MarkdownEditor(
             text: $text,
             fontSize: fontSize,
+            font: font,
             bridge: bridge,
             onImageRequest: { showImagePicker = true }
         )
@@ -79,6 +85,7 @@ struct EditView: View {
 private struct MarkdownEditor: UIViewRepresentable {
     @Binding var text: String
     let fontSize: Double
+    let font: DocumentFont
     let bridge: EditorBridge
     let onImageRequest: () -> Void
 
@@ -95,7 +102,7 @@ private struct MarkdownEditor: UIViewRepresentable {
         tv.smartDashesType = .no
         tv.smartInsertDeleteType = .no
         tv.alwaysBounceVertical = true
-        tv.font = UIFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular)
+        tv.font = font.uiFont(size: CGFloat(fontSize))
         tv.text = text
         tv.inputAccessoryView = context.coordinator.makeAccessoryView()
         context.coordinator.textView = tv
@@ -109,7 +116,7 @@ private struct MarkdownEditor: UIViewRepresentable {
         if tv.text != text {
             tv.text = text
         }
-        let newFont = UIFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular)
+        let newFont = font.uiFont(size: CGFloat(fontSize))
         if tv.font != newFont {
             tv.font = newFont
         }

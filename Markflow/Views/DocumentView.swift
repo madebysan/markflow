@@ -6,6 +6,8 @@ struct DocumentView: View {
     let sourceURL: URL?
     let onClose: () -> Void
 
+    @AppStorage(AppPreferences.newFileModeKey) private var newFileModeRaw: String = NewFileMode.edit.rawValue
+
     @State private var mode: Mode = .preview
     @State private var workingText: String = ""
     @State private var didInit: Bool = false
@@ -232,9 +234,15 @@ struct DocumentView: View {
         workingText = documentText
         currentURL = sourceURL
         displayName = sourceURL?.lastPathComponent ?? "Untitled.md"
-        if documentText.isEmpty {
-            mode = .edit
+
+        if sourceURL == nil {
+            // New document — honor the user's "New file mode" preference.
+            let preference = NewFileMode(rawValue: newFileModeRaw) ?? .edit
+            mode = preference == .preview ? .preview : .edit
+        } else {
+            mode = .preview
         }
+
         didInit = true
     }
 
