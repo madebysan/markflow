@@ -289,12 +289,54 @@ struct DocumentView: View {
         guard let url = currentURL else { return }
         do {
             try workingText.write(to: url, atomically: true, encoding: .utf8)
+            copyReferencedImagesAlongside(documentURL: url)
             onClose()
         } catch {
             saveAlert = SaveAlert(
                 title: "Couldn't save",
                 message: "\(error.localizedDescription)\n\nTry again, or use “Save as New File” to pick a different location."
             )
+        }
+    }
+
+    /// Copies any `images/<filename>` referenced by the markdown from the app's
+    /// Documents/images folder to a sibling `images/` folder next to the saved
+    /// .md file — so other markdown apps can resolve the relative paths too.
+    /// Silent on failure (e.g. read-only parent directory).
+    private func copyReferencedImagesAlongside(documentURL: URL) {
+        let pattern = #"!\[[^\]]*\]\(images/([^)]+)\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
+        let nsText = workingText as NSString
+        let matches = regex.matches(in: workingText, range: NSRange(location: 0, length: nsText.length))
+        guard !matches.isEmpty else { return }
+
+        let parentDir = documentURL.deletingLastPathComponent()
+        let destImagesDir = parentDir.appendingPathComponent("images", isDirectory: true)
+        let fm = FileManager.default
+
+        do {
+            if !fm.fileExists(atPath: destImagesDir.path) {
+                try fm.createDirectory(at: destImagesDir, withIntermediateDirectories: true)
+            }
+        } catch {
+            return  // Couldn't create folder — likely read-only parent, give up.
+        }
+
+        var copied = Set<String>()
+        for match in matches {
+            guard match.numberOfRanges > 1 else { continue }
+            let filename = nsText.substring(with: match.range(at: 1))
+                .removingPercentEncoding ?? nsText.substring(with: match.range(at: 1))
+            if copied.contains(filename) { continue }
+            copied.insert(filename)
+
+            let src = ImageStore.folderURL.appendingPathComponent(filename)
+            let dst = destImagesDir.appendingPathComponent(filename)
+            guard fm.fileExists(atPath: src.path) else { continue }
+            if !fm.fileExists(atPath: dst.path) {
+                try? fm.copyItem(at: src, to: dst)
+            }
         }
     }
 
@@ -334,7 +376,8 @@ struct DocumentView: View {
 
     private func handleExporterResult(_ result: Result<URL, Error>) {
         switch result {
-        case .success:
+        case .success(let url):
+            copyReferencedImagesAlongside(documentURL: url)
             onClose()
         case .failure(let error):
             let nsError = error as NSError

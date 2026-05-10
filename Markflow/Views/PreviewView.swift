@@ -50,9 +50,11 @@ struct PreviewView: UIViewRepresentable {
     }
 
     private func applyFontPreferences(in webView: WKWebView) {
+        // jsonString returns a string already wrapped in JS quotes —
+        // interpolate it directly, do not add extra surrounding quotes.
         let family = Self.jsonString(from: font.cssFamily)
         let stretch = Self.jsonString(from: font.cssStretch)
-        let js = "setFontPreferences(\"\(family)\", \"\(stretch)\", \(Int(previewFontSize)))"
+        let js = "setFontPreferences(\(family), \(stretch), \(Int(previewFontSize)))"
         webView.evaluateJavaScript(js, completionHandler: nil)
     }
 
@@ -91,12 +93,12 @@ struct PreviewView: UIViewRepresentable {
             // Tell preview.js where to resolve relative image paths from.
             let basePath = "file://" + PreviewAssets.documentsURL.path + "/"
             let escapedBase = PreviewView.jsonString(from: basePath)
-            webView.evaluateJavaScript("window.imageBasePath = \"\(escapedBase)\";", completionHandler: nil)
+            webView.evaluateJavaScript("window.imageBasePath = \(escapedBase);", completionHandler: nil)
 
             let family = PreviewView.jsonString(from: pendingFont.cssFamily)
             let stretch = PreviewView.jsonString(from: pendingFont.cssStretch)
             webView.evaluateJavaScript(
-                "setFontPreferences(\"\(family)\", \"\(stretch)\", \(Int(pendingFontSize)))",
+                "setFontPreferences(\(family), \(stretch), \(Int(pendingFontSize)))",
                 completionHandler: nil
             )
 
