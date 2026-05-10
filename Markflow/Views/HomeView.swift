@@ -8,8 +8,14 @@ struct HomeView: View {
     @State private var accessURL: URL?
     @State private var didAnimateIn = false
     @State private var showSettings = false
+    @State private var recents = RecentsStore.shared
 
     private let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    }()
 
     var body: some View {
         ZStack {
@@ -17,13 +23,21 @@ struct HomeView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                Spacer(minLength: 40)
+                Spacer(minLength: hasRecents ? 56 : 40)
 
                 brandStack
                     .opacity(didAnimateIn ? 1 : 0)
                     .offset(y: didAnimateIn ? 0 : 14)
 
                 Spacer()
+
+                if hasRecents {
+                    recentsSection
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 16)
+                        .opacity(didAnimateIn ? 1 : 0)
+                        .offset(y: didAnimateIn ? 0 : 14)
+                }
 
                 actionStack
                     .padding(.horizontal, 24)
@@ -93,12 +107,12 @@ struct HomeView: View {
         LinearGradient(
             colors: colorScheme == .dark
                 ? [
-                    Color(red: 0.06, green: 0.04, blue: 0.14),
-                    Color(red: 0.12, green: 0.07, blue: 0.22)
+                    Color(red: 0.10, green: 0.10, blue: 0.13),
+                    Color(red: 0.14, green: 0.12, blue: 0.18)
                 ]
                 : [
-                    Color(red: 0.95, green: 0.96, blue: 1.00),
-                    Color(red: 0.89, green: 0.86, blue: 1.00)
+                    Color(red: 0.98, green: 0.98, blue: 0.99),
+                    Color(red: 0.94, green: 0.93, blue: 0.97)
                 ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -181,14 +195,86 @@ struct HomeView: View {
             }
             .buttonStyle(PressScaleStyle())
 
-            // Secondary — Welcome tour
-            Button {
-                openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
-            } label: {
-                whiteLabel(icon: "sparkles", title: "Welcome to Markflow")
+            if !hasRecents {
+                // Secondary — Welcome tour (hidden once user has any recents)
+                Button {
+                    openedDocument = OpenedDocument(text: Self.welcomeTemplate(), sourceURL: nil)
+                } label: {
+                    whiteLabel(icon: "sparkles", title: "Welcome to Markflow")
+                }
+                .buttonStyle(PressScaleStyle())
             }
-            .buttonStyle(PressScaleStyle())
         }
+    }
+
+    private var hasRecents: Bool {
+        !recents.entries.isEmpty
+    }
+
+    private var recentsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Recent")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.primary.opacity(0.55))
+                    .textCase(.uppercase)
+                    .tracking(0.4)
+                Spacer()
+            }
+            .padding(.horizontal, 4)
+
+            VStack(spacing: 6) {
+                ForEach(recents.entries.prefix(5)) { entry in
+                    Button {
+                        openRecent(entry)
+                    } label: {
+                        recentRow(entry)
+                    }
+                    .buttonStyle(PressScaleStyle())
+                }
+            }
+        }
+    }
+
+    private func recentRow(_ entry: RecentEntry) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: "doc.text")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(.primary.opacity(0.55))
+                .frame(width: 28)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.displayName)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                Text(Self.relativeFormatter.localizedString(for: entry.lastOpened, relativeTo: Date()))
+                    .font(.system(size: 12))
+                    .foregroundStyle(.primary.opacity(0.5))
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.primary.opacity(0.3))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.5)
+        )
+    }
+
+    private func openRecent(_ entry: RecentEntry) {
+        guard let url = recents.resolve(entry) else { return }
+        open(url: url)
     }
 
     private func whiteLabel(icon: String, title: String) -> some View {
@@ -255,6 +341,7 @@ struct HomeView: View {
         do {
             let text = try String(contentsOf: url, encoding: .utf8)
             openedDocument = OpenedDocument(text: text, sourceURL: url)
+            recents.add(url: url)
             // Keep access alive until the document view closes so Save can
             // write back to the original file.
             if didAccess {

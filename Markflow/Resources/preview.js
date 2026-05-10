@@ -70,6 +70,18 @@
 
   marked.use({ renderer, breaks: true, gfm: true });
 
+  // Rewrite relative <img src> paths to absolute file:// URLs scoped to
+  // window.imageBasePath (set from Swift). Leaves absolute URLs alone.
+  function rewriteImageSources(root) {
+    if (!window.imageBasePath) return;
+    root.querySelectorAll('img').forEach((img) => {
+      const src = img.getAttribute('src') || '';
+      if (!src) return;
+      if (/^(https?:|file:|data:|\/)/.test(src)) return;
+      img.setAttribute('src', window.imageBasePath + src);
+    });
+  }
+
   // Expose render() for Swift to call via evaluateJavaScript
   let mermaidCounter = 0;
   window.render = async function(md) {
@@ -80,6 +92,8 @@
     }
     try {
       el.innerHTML = marked.parse(md);
+
+      rewriteImageSources(el);
 
       // Syntax highlight any language-* code blocks (skip mermaid)
       el.querySelectorAll('pre code[class*="language-"]').forEach((block) => {

@@ -26,7 +26,7 @@ struct PreviewView: UIViewRepresentable {
 
         context.coordinator.webView = webView
 
-        loadTemplate(into: webView, baseURL: baseURL)
+        loadTemplate(into: webView)
         context.coordinator.pendingMarkdown = markdown
 
         return webView
@@ -39,18 +39,11 @@ struct PreviewView: UIViewRepresentable {
         }
     }
 
-    private func loadTemplate(into webView: WKWebView, baseURL: URL?) {
-        guard let url = Bundle.main.url(forResource: "preview", withExtension: "html") else {
-            return
-        }
-        // loadFileURL explicitly grants WebKit read access to the Resources
-        // folder — this is the iOS-recommended way to load bundled HTML with
-        // sibling JS/CSS files and avoids the sandbox-extension errors that
-        // loadHTMLString(baseURL:) can hit on device.
-        // Known v0 limitation: relative image paths in the user's markdown
-        // won't resolve — users need absolute URLs for images.
-        let resourcesDir = url.deletingLastPathComponent()
-        webView.loadFileURL(url, allowingReadAccessTo: resourcesDir)
+    private func loadTemplate(into webView: WKWebView) {
+        let url = PreviewAssets.previewHTMLURL
+        // Grant read access to the whole Documents folder so images saved
+        // under Documents/images/ can be loaded by the page.
+        webView.loadFileURL(url, allowingReadAccessTo: PreviewAssets.documentsURL)
     }
 
     private func render(markdown: String, in webView: WKWebView) {
@@ -76,6 +69,11 @@ struct PreviewView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isReady = true
+            // Tell preview.js where to resolve relative image paths from.
+            let basePath = "file://" + PreviewAssets.documentsURL.path + "/"
+            let escapedBase = PreviewView.jsonString(from: basePath)
+            webView.evaluateJavaScript("window.imageBasePath = \"\(escapedBase)\";", completionHandler: nil)
+
             let escaped = PreviewView.jsonString(from: pendingMarkdown)
             webView.evaluateJavaScript("render(\(escaped))", completionHandler: nil)
         }

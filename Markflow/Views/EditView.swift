@@ -1,18 +1,30 @@
 import SwiftUI
 import UIKit
 
+final class EditorBridge {
+    var insertImageMarkdown: ((String, String) -> Void)?
+}
+
 struct EditView: View {
     @Binding var text: String
 
     @AppStorage("editFontSize") private var fontSize: Double = 16
     @State private var gestureStartSize: Double = 16
     @State private var isPinching: Bool = false
+    @State private var bridge = EditorBridge()
+    @State private var showImagePicker = false
+    @State private var pickerError: String?
 
     private let minFont: Double = 10
     private let maxFont: Double = 36
 
     var body: some View {
-        MarkdownEditor(text: $text, fontSize: fontSize)
+        MarkdownEditor(
+            text: $text,
+            fontSize: fontSize,
+            bridge: bridge,
+            onImageRequest: { showImagePicker = true }
+        )
             .gesture(
                 MagnifyGesture()
                     .onChanged { value in
@@ -27,6 +39,38 @@ struct EditView: View {
                         isPinching = false
                     }
             )
+            .sheet(isPresented: $showImagePicker) {
+                ImagePickerSheet { image, suggestedName in
+                    handlePicked(image: image, suggestedName: suggestedName)
+                }
+                .ignoresSafeArea()
+            }
+            .alert(
+                "Couldn't add image",
+                isPresented: Binding(
+                    get: { pickerError != nil },
+                    set: { if !$0 { pickerError = nil } }
+                ),
+                presenting: pickerError
+            ) { _ in
+                Button("OK", role: .cancel) {}
+            } message: { error in
+                Text(error)
+            }
+    }
+
+    private func handlePicked(image: UIImage?, suggestedName: String?) {
+        showImagePicker = false
+        guard let image else { return }
+        do {
+            let cleanName = (suggestedName?.replacingOccurrences(of: " ", with: "-"))
+                .flatMap { $0.isEmpty ? nil : $0 }
+            let ref = try ImageStore.save(image: image, suggestedName: cleanName)
+            let alt = suggestedName ?? ""
+            bridge.insertImageMarkdown?(ref, alt)
+        } catch {
+            pickerError = error.localizedDescription
+        }
     }
 }
 
@@ -35,6 +79,8 @@ struct EditView: View {
 private struct MarkdownEditor: UIViewRepresentable {
     @Binding var text: String
     let fontSize: Double
+    let bridge: EditorBridge
+    let onImageRequest: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
@@ -53,6 +99,9 @@ private struct MarkdownEditor: UIViewRepresentable {
         tv.text = text
         tv.inputAccessoryView = context.coordinator.makeAccessoryView()
         context.coordinator.textView = tv
+        bridge.insertImageMarkdown = { [weak coord = context.coordinator] ref, alt in
+            coord?.insertImageMarkdown(ref: ref, alt: alt)
+        }
         return tv
     }
 
@@ -102,7 +151,7 @@ private struct MarkdownEditor: UIViewRepresentable {
             case .link:
                 insertLink(tv, prefix: "[", urlPart: "](https://)")
             case .image:
-                insertLink(tv, prefix: "![", urlPart: "](https://)")
+                parent.onImageRequest()
             case .rule:
                 insertBlock(tv, text: "\n\n---\n\n", cursorOffset: nil)
             case .codeBlock:
@@ -112,6 +161,14 @@ private struct MarkdownEditor: UIViewRepresentable {
                     cursorOffset: 5 // place cursor after "\n```\n"
                 )
             }
+        }
+
+        func insertImageMarkdown(ref: String, alt: String) {
+            guard let tv = textView else { return }
+            let range = tv.selectedRange
+            let markdown = "![\(alt)](\(ref))"
+            replace(tv, range: range, with: markdown)
+            setCursor(tv, to: range.location + (markdown as NSString).length)
         }
 
         private func wrap(_ tv: UITextView, prefix: String, suffix: String, placeholder: String) {
@@ -217,9 +274,16 @@ private enum MarkdownCommand {
 private final class MarkdownToolbarView: UIView {
     var onTap: ((MarkdownCommand) -> Void)?
 
+    private let capsule = UIView()
+    private let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
     private let scrollView = UIScrollView()
     private let stack = UIStackView()
+    private let dismissDivider = UIView()
     private let dismissButton = UIButton(type: .system)
+
+    private let toolbarHeight: CGFloat = 60
+    private let capsuleHeight: CGFloat = 44
+    private let horizontalInset: CGFloat = 12
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -229,63 +293,75 @@ private final class MarkdownToolbarView: UIView {
     required init?(coder: NSCoder) { nil }
 
     override var intrinsicContentSize: CGSize {
-        CGSize(width: UIView.noIntrinsicMetric, height: 44)
+        CGSize(width: UIView.noIntrinsicMetric, height: toolbarHeight)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        capsule.layer.cornerRadius = capsuleHeight / 2
     }
 
     private func setup() {
         autoresizingMask = [.flexibleWidth]
-        // inputAccessoryView gets auto-sized to the keyboard width; only height matters here.
-        frame = CGRect(x: 0, y: 0, width: 0, height: 44)
+        backgroundColor = .clear
+        frame = CGRect(x: 0, y: 0, width: 0, height: toolbarHeight)
 
-        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
+        capsule.translatesAutoresizingMaskIntoConstraints = false
+        capsule.layer.cornerCurve = .continuous
+        capsule.clipsToBounds = true
+        capsule.layer.borderWidth = 0.5
+        capsule.layer.borderColor = UIColor.label.withAlphaComponent(0.08).cgColor
+        addSubview(capsule)
+
         blur.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(blur)
-
-        let divider = UIView()
-        divider.translatesAutoresizingMaskIntoConstraints = false
-        divider.backgroundColor = UIColor.separator.withAlphaComponent(0.4)
-        addSubview(divider)
+        capsule.addSubview(blur)
 
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.alwaysBounceHorizontal = true
-        addSubview(scrollView)
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+        capsule.addSubview(scrollView)
 
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.spacing = 2
         stack.alignment = .center
         stack.isLayoutMarginsRelativeArrangement = true
-        stack.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        stack.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6)
         scrollView.addSubview(stack)
+
+        dismissDivider.translatesAutoresizingMaskIntoConstraints = false
+        dismissDivider.backgroundColor = UIColor.separator.withAlphaComponent(0.45)
+        capsule.addSubview(dismissDivider)
 
         dismissButton.translatesAutoresizingMaskIntoConstraints = false
         let keyboardImage = UIImage(
             systemName: "keyboard.chevron.compact.down",
-            withConfiguration: UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
+            withConfiguration: UIImage.SymbolConfiguration(pointSize: 18, weight: .regular)
         )
         dismissButton.setImage(keyboardImage, for: .normal)
         dismissButton.tintColor = .label
         dismissButton.addTarget(self, action: #selector(dismissKeyboard), for: .touchUpInside)
-        addSubview(dismissButton)
+        capsule.addSubview(dismissButton)
 
         buildButtons()
 
         NSLayoutConstraint.activate([
-            blur.topAnchor.constraint(equalTo: topAnchor),
-            blur.leadingAnchor.constraint(equalTo: leadingAnchor),
-            blur.trailingAnchor.constraint(equalTo: trailingAnchor),
-            blur.bottomAnchor.constraint(equalTo: bottomAnchor),
+            capsule.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalInset),
+            capsule.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalInset),
+            capsule.centerYAnchor.constraint(equalTo: centerYAnchor),
+            capsule.heightAnchor.constraint(equalToConstant: capsuleHeight),
 
-            divider.topAnchor.constraint(equalTo: topAnchor),
-            divider.leadingAnchor.constraint(equalTo: leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: trailingAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 0.5),
+            blur.topAnchor.constraint(equalTo: capsule.topAnchor),
+            blur.leadingAnchor.constraint(equalTo: capsule.leadingAnchor),
+            blur.trailingAnchor.constraint(equalTo: capsule.trailingAnchor),
+            blur.bottomAnchor.constraint(equalTo: capsule.bottomAnchor),
 
-            scrollView.topAnchor.constraint(equalTo: topAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: dismissButton.leadingAnchor, constant: -4),
-            scrollView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: capsule.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: capsule.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: dismissDivider.leadingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: capsule.bottomAnchor),
 
             stack.topAnchor.constraint(equalTo: scrollView.topAnchor),
             stack.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -293,10 +369,15 @@ private final class MarkdownToolbarView: UIView {
             stack.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stack.heightAnchor.constraint(equalTo: scrollView.heightAnchor),
 
-            dismissButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            dismissButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            dismissButton.widthAnchor.constraint(equalToConstant: 36),
-            dismissButton.heightAnchor.constraint(equalToConstant: 36)
+            dismissDivider.widthAnchor.constraint(equalToConstant: 0.5),
+            dismissDivider.heightAnchor.constraint(equalToConstant: 24),
+            dismissDivider.centerYAnchor.constraint(equalTo: capsule.centerYAnchor),
+            dismissDivider.trailingAnchor.constraint(equalTo: dismissButton.leadingAnchor, constant: -2),
+
+            dismissButton.centerYAnchor.constraint(equalTo: capsule.centerYAnchor),
+            dismissButton.trailingAnchor.constraint(equalTo: capsule.trailingAnchor, constant: -4),
+            dismissButton.widthAnchor.constraint(equalToConstant: 40),
+            dismissButton.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
 
@@ -356,12 +437,12 @@ private final class MarkdownToolbarView: UIView {
 
     private func makeButton(symbol: String, accessibility: String, command: MarkdownCommand) -> UIButton {
         let button = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .medium)
+        let config = UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
         button.setImage(UIImage(systemName: symbol, withConfiguration: config), for: .normal)
         button.tintColor = .label
         button.accessibilityLabel = accessibility
-        button.widthAnchor.constraint(equalToConstant: 38).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 36).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 42).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 40).isActive = true
         button.addAction(UIAction { [weak self] _ in
             self?.onTap?(command)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -372,15 +453,15 @@ private final class MarkdownToolbarView: UIView {
     private func makeDivider() -> UIView {
         let box = UIView()
         let line = UIView()
-        line.backgroundColor = UIColor.separator.withAlphaComponent(0.5)
+        line.backgroundColor = UIColor.separator.withAlphaComponent(0.45)
         line.translatesAutoresizingMaskIntoConstraints = false
         box.addSubview(line)
         NSLayoutConstraint.activate([
-            box.widthAnchor.constraint(equalToConstant: 9),
+            box.widthAnchor.constraint(equalToConstant: 10),
             line.centerXAnchor.constraint(equalTo: box.centerXAnchor),
             line.centerYAnchor.constraint(equalTo: box.centerYAnchor),
             line.widthAnchor.constraint(equalToConstant: 1),
-            line.heightAnchor.constraint(equalToConstant: 20)
+            line.heightAnchor.constraint(equalToConstant: 22)
         ])
         return box
     }
