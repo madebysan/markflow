@@ -2,7 +2,8 @@ import SwiftUI
 
 @main
 struct MarkflowApp: App {
-    @AppStorage(AccentColorStore.storageKey) private var accentHex: String = AccentColorStore.defaultHex
+    @AppStorage(AppPreferences.themeIDKey) private var themeID: String = AppThemeCatalog.defaultID
+    @AppStorage(AppPreferences.appearanceKey) private var appearance: String = AppearancePreference.system.rawValue
 
     init() {
         // Copy preview assets to Documents so WKWebView can load them with
@@ -19,7 +20,8 @@ struct MarkflowApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
-                .tint(HexColor.color(fromHex: accentHex))
+                .tint(AppThemeCatalog.theme(for: themeID).accentColor)
+                .preferredColorScheme(AppearancePreference(rawValue: appearance)?.colorScheme)
         }
     }
 }

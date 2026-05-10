@@ -19,6 +19,10 @@ struct DocumentView: View {
     @State private var renameInput: String = ""
     @State private var saveAlert: SaveAlert?
 
+    @State private var swipeOffset: CGFloat = 0
+    private let edgeThreshold: CGFloat = 24
+    private let dismissThreshold: CGFloat = 90
+
     enum Mode: String, CaseIterable, Identifiable {
         case preview, edit
         var id: String { rawValue }
@@ -40,6 +44,8 @@ struct DocumentView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 modeTogglePill
             }
+            .offset(x: swipeOffset)
+            .simultaneousGesture(swipeBackGesture)
             .confirmationDialog(
                 "Unsaved changes",
                 isPresented: $showExitConfirmation,
@@ -127,6 +133,25 @@ struct DocumentView: View {
             .accessibilityLabel("More options")
             .disabled(workingText.isEmpty)
         }
+    }
+
+    private var swipeBackGesture: some Gesture {
+        DragGesture(minimumDistance: 8, coordinateSpace: .global)
+            .onChanged { value in
+                guard value.startLocation.x < edgeThreshold else { return }
+                swipeOffset = max(0, value.translation.width)
+            }
+            .onEnded { value in
+                let startedAtEdge = value.startLocation.x < edgeThreshold
+                let pastThreshold = value.translation.width > dismissThreshold
+                if startedAtEdge && pastThreshold {
+                    attemptClose()
+                } else {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
+                        swipeOffset = 0
+                    }
+                }
+            }
     }
 
     private var modeTogglePill: some View {
