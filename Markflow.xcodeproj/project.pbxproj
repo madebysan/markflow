@@ -18,13 +18,17 @@
 		4913E3E042BE5D79D4A2E21E /* WebViewPrewarmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */; };
 		4FB2791CD85D2E0947812398 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6B86A64108045E28EE7DE /* EditView.swift */; };
 		58D1CF5047F1D9F84DF05BF6 /* RecentsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15518783BCA726EFB1A201D0 /* RecentsStore.swift */; };
+		5C54A65715FA20BDE79CE09F /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42CA1C0FD6263B1CA615A128 /* JetBrainsMono-Regular.ttf */; };
 		5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
 		8212AF08CC08141886FA2875 /* PreviewAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA73EFC38D3A3EFCA1A4AE9 /* PreviewAssets.swift */; };
 		82E44933A76399EF81171A06 /* welcome.md in Resources */ = {isa = PBXBuildFile; fileRef = 36FF6F883E08456B1A6C45B9 /* welcome.md */; };
+		86EE696DD12690A03D8465E3 /* iAWriterQuattroS-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EBAAEBE32609775C2809550F /* iAWriterQuattroS-Bold.ttf */; };
 		915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */; };
 		A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
+		B773466CBF19542667484DBA /* iAWriterQuattroS-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34C6D8C3C173C89767EBE9C8 /* iAWriterQuattroS-Regular.ttf */; };
 		B93C8C70AED78809F171BDAE /* AccentColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5176ADC5810396E3CA3DA4FC /* AccentColor.swift */; };
+		CF272BC6F19DC1E40D9631DC /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C62487C474A094BE882CB47F /* JetBrainsMono-Bold.ttf */; };
 		DC71C81B77135BE7BAE92D5D /* preview.js in Resources */ = {isa = PBXBuildFile; fileRef = E5DC9E1E126C7B4CC6F8D12F /* preview.js */; };
 		DEF784FE4631DFB23F76D417 /* ImagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB884EA862099EAC0FCB4CAB /* ImagePickerSheet.swift */; };
 		E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC466180FA15E44EBC9BBF8 /* HomeView.swift */; };
@@ -37,7 +41,9 @@
 		1E667F2B55F149B8B84F82A6 /* highlight-github-dark.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github-dark.css"; sourceTree = "<group>"; };
 		1EDCBDF8383F57432E097047 /* WebViewPrewarmer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPrewarmer.swift; sourceTree = "<group>"; };
 		1F1EE986DBAB7D4A81C1346C /* ImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStore.swift; sourceTree = "<group>"; };
+		34C6D8C3C173C89767EBE9C8 /* iAWriterQuattroS-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iAWriterQuattroS-Regular.ttf"; sourceTree = "<group>"; };
 		36FF6F883E08456B1A6C45B9 /* welcome.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = welcome.md; sourceTree = "<group>"; };
+		42CA1C0FD6263B1CA615A128 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		4B561E95D4411E64ACD65FFA /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
 		5176ADC5810396E3CA3DA4FC /* AccentColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccentColor.swift; sourceTree = "<group>"; };
 		8C4279291B38384200DC0ED7 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
@@ -49,11 +55,13 @@
 		BCA73EFC38D3A3EFCA1A4AE9 /* PreviewAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewAssets.swift; sourceTree = "<group>"; };
 		BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		C11F2D8BB2D849BE27ECEAC1 /* Markflow.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Markflow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C62487C474A094BE882CB47F /* JetBrainsMono-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Bold.ttf"; sourceTree = "<group>"; };
 		C96A127F1DF08DC0942CCDE2 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		CB884EA862099EAC0FCB4CAB /* ImagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerSheet.swift; sourceTree = "<group>"; };
 		CE6818521117AE0878C221A4 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
 		D14F24817E86AA8610867B5C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E5DC9E1E126C7B4CC6F8D12F /* preview.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = preview.js; sourceTree = "<group>"; };
+		EBAAEBE32609775C2809550F /* iAWriterQuattroS-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iAWriterQuattroS-Bold.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -71,6 +79,17 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		33BF842846DAC1680462AE81 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				EBAAEBE32609775C2809550F /* iAWriterQuattroS-Bold.ttf */,
+				34C6D8C3C173C89767EBE9C8 /* iAWriterQuattroS-Regular.ttf */,
+				C62487C474A094BE882CB47F /* JetBrainsMono-Bold.ttf */,
+				42CA1C0FD6263B1CA615A128 /* JetBrainsMono-Regular.ttf */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
 		5E84B632DF95956E659CCA61 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +101,7 @@
 				4B561E95D4411E64ACD65FFA /* preview.html */,
 				E5DC9E1E126C7B4CC6F8D12F /* preview.js */,
 				36FF6F883E08456B1A6C45B9 /* welcome.md */,
+				33BF842846DAC1680462AE81 /* fonts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -179,9 +199,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				03662B17E01E8878C35E4F1C /* Assets.xcassets in Resources */,
+				CF272BC6F19DC1E40D9631DC /* JetBrainsMono-Bold.ttf in Resources */,
+				5C54A65715FA20BDE79CE09F /* JetBrainsMono-Regular.ttf in Resources */,
 				1ADE8FAF71612F864FEE8ECE /* highlight-github-dark.css in Resources */,
 				5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */,
 				A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */,
+				86EE696DD12690A03D8465E3 /* iAWriterQuattroS-Bold.ttf in Resources */,
+				B773466CBF19542667484DBA /* iAWriterQuattroS-Regular.ttf in Resources */,
 				2D376B69B6BB2D3479C0E888 /* marked.min.js in Resources */,
 				27645E6618F39052A6EA5112 /* mermaid.min.js in Resources */,
 				1C38B4F36231910110F7A914 /* preview.html in Resources */,
@@ -287,7 +311,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -307,7 +331,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Markflow/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

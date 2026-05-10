@@ -227,7 +227,7 @@ struct HomeView: View {
             .padding(.horizontal, 4)
 
             VStack(spacing: 6) {
-                ForEach(recents.entries.prefix(5)) { entry in
+                ForEach(recents.entries.prefix(4)) { entry in
                     Button {
                         openRecent(entry)
                     } label: {
