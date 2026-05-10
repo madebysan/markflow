@@ -7,6 +7,7 @@ struct HomeView: View {
     @State private var openedDocument: OpenedDocument?
     @State private var accessURL: URL?
     @State private var didAnimateIn = false
+    @State private var showSettings = false
 
     private let markdownType = UTType("net.daringfireball.markdown") ?? .plainText
 
@@ -34,6 +35,9 @@ struct HomeView: View {
                     .padding(.bottom, 32)
                     .opacity(didAnimateIn ? 1 : 0)
             }
+
+            settingsButton
+                .opacity(didAnimateIn ? 1 : 0)
         }
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) {
@@ -57,6 +61,30 @@ struct HomeView: View {
         .onOpenURL { url in
             open(url: url)
         }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+    }
+
+    private var settingsButton: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(.primary.opacity(0.6))
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Settings")
+            }
+            Spacer()
+        }
+        .padding(.top, 8)
+        .padding(.trailing, 8)
     }
 
     // MARK: - Subviews
@@ -278,13 +306,7 @@ private struct DocumentContainer: View {
                 sourceURL: openedDocument.sourceURL,
                 onClose: onClose
             )
-            .navigationTitle(title)
-            .toolbarTitleDisplayMode(.inline)
         }
-    }
-
-    private var title: String {
-        openedDocument.sourceURL?.lastPathComponent ?? "Untitled.md"
     }
 }
 

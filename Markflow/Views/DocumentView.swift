@@ -10,8 +10,13 @@ struct DocumentView: View {
     @State private var workingText: String = ""
     @State private var didInit: Bool = false
 
+    @State private var currentURL: URL?
+    @State private var displayName: String = "Untitled.md"
+
     @State private var showExitConfirmation: Bool = false
     @State private var showExporter: Bool = false
+    @State private var showRenameAlert: Bool = false
+    @State private var renameInput: String = ""
     @State private var saveAlert: SaveAlert?
 
     enum Mode: String, CaseIterable, Identifiable {
@@ -27,8 +32,14 @@ struct DocumentView: View {
 
     var body: some View {
         content
+            .navigationTitle(displayName)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbarBackground(.automatic, for: .navigationBar)
             .onAppear(perform: initializeOnFirstAppear)
             .toolbar { toolbarContent }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                modeTogglePill
+            }
             .confirmationDialog(
                 "Unsaved changes",
                 isPresented: $showExitConfirmation,
@@ -45,6 +56,17 @@ struct DocumentView: View {
                 defaultFilename: newFileDefaultName,
                 onCompletion: handleExporterResult
             )
+            .alert("Rename", isPresented: $showRenameAlert) {
+                TextField("Name", text: $renameInput)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Button("Rename") { performRename() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(currentURL != nil
+                    ? "Rename will move the file in place."
+                    : "Sets the suggested name when you save this file.")
+            }
             .alert(
                 saveAlert?.title ?? "",
                 isPresented: saveAlertBinding,
@@ -75,33 +97,63 @@ struct DocumentView: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
             }
+            .accessibilityLabel("Close")
         }
 
-        ToolbarItem(placement: .principal) {
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button {
+                    renameTapped()
+                } label: {
+                    Label("Rename", systemImage: "pencil")
+                }
+
+                Button {
+                    showExporter = true
+                } label: {
+                    Label("Save to Files", systemImage: "square.and.arrow.down")
+                }
+
+                ShareLink(
+                    item: MarkdownExport(filename: exportFileName, text: workingText),
+                    preview: SharePreview(exportFileName)
+                ) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .accessibilityLabel("More options")
+            .disabled(workingText.isEmpty)
+        }
+    }
+
+    private var modeTogglePill: some View {
+        HStack {
+            Spacer()
             Picker("Mode", selection: $mode) {
                 ForEach(Mode.allCases) { m in
                     Text(m.label).tag(m)
                 }
             }
             .pickerStyle(.segmented)
-            .frame(width: 180)
+            .frame(width: 200)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+            )
+            Spacer()
         }
-
-        ToolbarItem(placement: .topBarTrailing) {
-            ShareLink(
-                item: MarkdownExport(filename: exportFileName, text: workingText),
-                preview: SharePreview(exportFileName)
-            ) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 17, weight: .semibold))
-            }
-            .disabled(workingText.isEmpty)
-        }
+        .padding(.bottom, 12)
     }
 
     @ViewBuilder
     private var exitConfirmationActions: some View {
-        if sourceURL != nil {
+        if currentURL != nil {
             Button("Save") { saveToSource() }
         }
         Button("Save as New File…") { showExporter = true }
@@ -116,15 +168,19 @@ struct DocumentView: View {
     }
 
     private var exportFileName: String {
-        let base = sourceURL?.deletingPathExtension().lastPathComponent ?? "Untitled"
-        return "\(base)-edited.md"
+        "\(baseName)-edited.md"
     }
 
     private var newFileDefaultName: String {
-        if let base = sourceURL?.deletingPathExtension().lastPathComponent {
-            return "\(base)-copy"
-        }
-        return "Untitled"
+        baseName == "Untitled" ? "Untitled" : "\(baseName)-copy"
+    }
+
+    private var baseName: String {
+        let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return "Untitled" }
+        let url = URL(fileURLWithPath: trimmed)
+        let base = url.deletingPathExtension().lastPathComponent
+        return base.isEmpty ? "Untitled" : base
     }
 
     private var markdownType: UTType {
@@ -132,7 +188,7 @@ struct DocumentView: View {
     }
 
     private var exitConfirmationMessage: String {
-        sourceURL != nil
+        currentURL != nil
             ? "“Save” writes over the original. “Save as New File” keeps the original untouched."
             : "Pick a location to save your new markdown file, or discard your work."
     }
@@ -149,6 +205,8 @@ struct DocumentView: View {
     private func initializeOnFirstAppear() {
         guard !didInit else { return }
         workingText = documentText
+        currentURL = sourceURL
+        displayName = sourceURL?.lastPathComponent ?? "Untitled.md"
         if documentText.isEmpty {
             mode = .edit
         }
@@ -164,7 +222,7 @@ struct DocumentView: View {
     }
 
     private func saveToSource() {
-        guard let url = sourceURL else { return }
+        guard let url = currentURL else { return }
         do {
             try workingText.write(to: url, atomically: true, encoding: .utf8)
             onClose()
@@ -174,6 +232,40 @@ struct DocumentView: View {
                 message: "\(error.localizedDescription)\n\nTry again, or use “Save as New File” to pick a different location."
             )
         }
+    }
+
+    private func renameTapped() {
+        renameInput = baseName
+        showRenameAlert = true
+    }
+
+    private func performRename() {
+        let newBase = renameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newBase.isEmpty else { return }
+        let safeBase = sanitize(newBase)
+        let newFilename = safeBase.hasSuffix(".md") ? safeBase : "\(safeBase).md"
+
+        if let url = currentURL {
+            let newURL = url.deletingLastPathComponent().appendingPathComponent(newFilename)
+            guard newURL != url else { return }
+            do {
+                try FileManager.default.moveItem(at: url, to: newURL)
+                currentURL = newURL
+                displayName = newFilename
+            } catch {
+                saveAlert = SaveAlert(
+                    title: "Couldn't rename",
+                    message: "\(error.localizedDescription)\n\nThe original file may be in a location Markflow can't write to. Try “Save to Files” to save a renamed copy."
+                )
+            }
+        } else {
+            displayName = newFilename
+        }
+    }
+
+    private func sanitize(_ input: String) -> String {
+        let invalid = CharacterSet(charactersIn: "/\\:?*\"<>|")
+        return input.components(separatedBy: invalid).joined(separator: "-")
     }
 
     private func handleExporterResult(_ result: Result<URL, Error>) {

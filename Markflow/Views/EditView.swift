@@ -301,7 +301,13 @@ private final class MarkdownToolbarView: UIView {
     }
 
     @objc private func dismissKeyboard() {
-        self.window?.endEditing(true)
+        // self.window points at the keyboard's UIInputWindow when this view
+        // is used as inputAccessoryView, so endEditing(true) on it does
+        // nothing. Walk the responder chain instead.
+        UIApplication.shared.sendAction(
+            #selector(UIResponder.resignFirstResponder),
+            to: nil, from: nil, for: nil
+        )
     }
 
     private func buildButtons() {

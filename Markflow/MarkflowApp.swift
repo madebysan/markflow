@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct MarkflowApp: App {
+    @AppStorage(AccentColorStore.storageKey) private var accentHex: String = AccentColorStore.defaultHex
+
     init() {
         // Kick off WebKit's process launch now so the first document open
         // doesn't pay ~7s of cold-start for the WebContent/GPU/Networking
@@ -12,6 +14,7 @@ struct MarkflowApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .tint(HexColor.color(fromHex: accentHex))
         }
     }
 }
