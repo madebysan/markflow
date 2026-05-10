@@ -7,10 +7,14 @@ struct DocumentView: View {
     let onClose: () -> Void
 
     @AppStorage(AppPreferences.newFileModeKey) private var newFileModeRaw: String = NewFileMode.edit.rawValue
+    @AppStorage(AppPreferences.documentFontKey) private var fontRaw: String = DocumentFont.system.rawValue
+    @AppStorage(AppPreferences.previewFontSizeKey) private var previewFontSize: Double = 17
 
     @State private var mode: Mode = .preview
     @State private var workingText: String = ""
     @State private var didInit: Bool = false
+    @State private var pdfShareItem: IdentifiableURL?
+    @State private var exportingPDF: Bool = false
 
     @State private var currentURL: URL?
     @State private var displayName: String = "Untitled.md"
@@ -89,6 +93,32 @@ struct DocumentView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
+            .sheet(item: $pdfShareItem) { item in
+                ShareSheet(items: [item.url])
+            }
+    }
+
+    private func exportPDF() {
+        guard !exportingPDF else { return }
+        exportingPDF = true
+        let font = DocumentFont(rawValue: fontRaw) ?? .system
+        PDFExporter.export(
+            markdown: workingText,
+            font: font,
+            fontSize: previewFontSize,
+            title: displayName
+        ) { result in
+            exportingPDF = false
+            switch result {
+            case .success(let url):
+                pdfShareItem = IdentifiableURL(url: url)
+            case .failure(let error):
+                saveAlert = SaveAlert(
+                    title: "Couldn't export PDF",
+                    message: error.localizedDescription
+                )
+            }
+        }
     }
 
     // MARK: - Body fragments
@@ -134,6 +164,13 @@ struct DocumentView: View {
                     Label("Share", systemImage: "square.and.arrow.up")
                 }
 
+                Button {
+                    exportPDF()
+                } label: {
+                    Label("Export as PDF", systemImage: "doc.richtext")
+                }
+                .disabled(exportingPDF || workingText.isEmpty)
+
                 Divider()
 
                 Button {
@@ -169,44 +206,27 @@ struct DocumentView: View {
     }
 
     private var modeTogglePill: some View {
-        HStack(spacing: 0) {
-            modeIconButton(target: .preview, icon: "eye", label: "Preview")
-            modeIconButton(target: .edit, icon: "pencil", label: "Edit")
-        }
-        .padding(4)
-        .background(
-            Capsule()
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    Capsule()
-                        .strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.5)
-                )
-                .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
-        )
-    }
-
-    private func modeIconButton(target: Mode, icon: String, label: String) -> some View {
-        let isSelected = mode == target
-        return Button {
-            withAnimation(.spring(response: 0.32, dampingFraction: 0.85)) {
-                mode = target
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                mode = (mode == .preview) ? .edit : .preview
             }
         } label: {
-            Image(systemName: icon)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(isSelected ? Color.white : .primary.opacity(0.55))
-                .frame(width: 48, height: 32)
+            Image(systemName: mode == .preview ? "pencil" : "eye")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: 48, height: 48)
+                .contentTransition(.symbolEffect(.replace))
                 .background(
-                    Group {
-                        if isSelected {
-                            Capsule().fill(.tint)
-                        }
-                    }
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            Circle().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
+                        )
+                        .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
                 )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(label) mode")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityLabel(mode == .preview ? "Switch to Edit" : "Switch to Preview")
     }
 
     @ViewBuilder
