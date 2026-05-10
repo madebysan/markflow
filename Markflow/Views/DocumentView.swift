@@ -43,8 +43,9 @@ struct DocumentView: View {
             .toolbarBackground(.automatic, for: .navigationBar)
             .onAppear(perform: initializeOnFirstAppear)
             .toolbar { toolbarContent }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
+            .overlay(alignment: .bottom) {
                 modeTogglePill
+                    .padding(.bottom, 10)
             }
             .offset(x: swipeOffset)
             .simultaneousGesture(swipeBackGesture)
@@ -157,25 +158,44 @@ struct DocumentView: View {
     }
 
     private var modeTogglePill: some View {
-        HStack {
-            Spacer()
-            Picker("Mode", selection: $mode) {
-                ForEach(Mode.allCases) { m in
-                    Text(m.label).tag(m)
-                }
-            }
-            .pickerStyle(.segmented)
-            .frame(width: 200)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
-            )
-            Spacer()
+        HStack(spacing: 0) {
+            modeIconButton(target: .preview, icon: "eye", label: "Preview")
+            modeIconButton(target: .edit, icon: "pencil", label: "Edit")
         }
-        .padding(.bottom, 12)
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.primary.opacity(0.06), lineWidth: 0.5)
+                )
+                .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
+        )
+    }
+
+    private func modeIconButton(target: Mode, icon: String, label: String) -> some View {
+        let isSelected = mode == target
+        return Button {
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.85)) {
+                mode = target
+            }
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(isSelected ? Color.white : .primary.opacity(0.55))
+                .frame(width: 48, height: 32)
+                .background(
+                    Group {
+                        if isSelected {
+                            Capsule().fill(.tint)
+                        }
+                    }
+                )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(label) mode")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     @ViewBuilder
