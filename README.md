@@ -4,7 +4,7 @@
 </p>
 <h1 align="center">Markflow</h1>
 <p align="center">Simple on-the-go markdown reader and editor for iOS.</p>
-<p align="center"><strong>Version 0.1.0</strong> · iOS 26 · SwiftUI</p>
+<p align="center"><strong>Version 0.2.0</strong> · iOS 26 · SwiftUI</p>
 
 <p align="center">
   <a href="https://apps.apple.com/us/app/markflow-markdown-reader/id6763440990">
@@ -24,7 +24,17 @@ Markflow is a native markdown reader and editor for iOS 26. Tap any `.md` file i
 
 ## How it works
 
-Files open in read-only mode by default. Switch to Edit and changes live in memory until you explicitly Save, Save as New File, or Share. The rich-text toolbar above the keyboard covers bold, italic, headings, lists, links, images, code, and blockquotes. Pinch-to-zoom works in both modes: WKWebView zoom in Preview, font scaling in Edit.
+Files open in read-only mode by default. Tap the floating eye/pencil glass button at the bottom to switch to Edit. Edits live in memory until you Save (writes to source), Save as New File (file picker), Share, or Export as PDF.
+
+A floating Liquid Glass keyboard toolbar covers headings, bold/italic/strikethrough, links, images (PHPicker → saved sibling to your .md), task/bullet/numbered lists, blockquotes, inline code, code blocks, and rules. Pinch-to-zoom works everywhere: WKWebView zoom in Preview, font scaling in Edit. Swipe from the left edge of an open document to dismiss it.
+
+Settings (gear in Home top-right, or in any document's ••• menu) covers:
+
+- **Appearance** — System / Light / Dark
+- **Theme** — 5 curated themes (Indigo, Forest, Sunset, Ocean, Graphite), each with light + dark accents
+- **Text** — 6 fonts (System, Rounded, Charter, Monospace, iA Writer, JetBrains Mono); editor + preview size sliders
+- **Behavior** — pick whether new files open in Edit or Preview
+- **Recents** — last 4 opened files surface on Home; clearable from Settings
 
 ## Build from source
 
@@ -93,6 +103,11 @@ Rendering libraries, vendored in `Markflow/Resources/`:
 - [marked](https://github.com/markedjs/marked) for markdown parsing
 - [highlight.js](https://github.com/highlightjs/highlight.js) for syntax highlighting
 - [Mermaid](https://github.com/mermaid-js/mermaid) for diagrams and flowcharts
+
+Bundled fonts (SIL Open Font License), in `Markflow/Resources/fonts/`:
+
+- [iA Writer Quattro S](https://github.com/iaolo/iA-Fonts) by iA Inc.
+- [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) by JetBrains
 
 ## License
 
