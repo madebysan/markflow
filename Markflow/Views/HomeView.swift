@@ -298,9 +298,16 @@ struct HomeView: View {
     }
 
     private var credit: some View {
-        Link(destination: URL(string: "https://santiagoalonso.com")!) {
-            Text("Made by santiagoalonso.com")
-                .font(.system(size: 13, weight: .medium))
+        Group {
+            if let url = AppLinks.url(AppLinks.website) {
+                Link(destination: url) {
+                    Text("Made by santiagoalonso.com")
+                        .font(.system(size: 13, weight: .medium))
+                }
+            } else {
+                Text("Made by santiagoalonso.com")
+                    .font(.system(size: 13, weight: .medium))
+            }
         }
         .tint(.primary.opacity(0.5))
     }

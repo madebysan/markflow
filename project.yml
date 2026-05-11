@@ -21,6 +21,8 @@ targets:
     platform: iOS
     sources:
       - path: Markflow
+    resources:
+      - path: Markflow/PrivacyInfo.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.san.markflow

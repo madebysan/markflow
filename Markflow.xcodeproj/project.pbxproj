@@ -19,6 +19,7 @@
 		4FB2791CD85D2E0947812398 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F6B86A64108045E28EE7DE /* EditView.swift */; };
 		54C2AAEB6B7AD0B3A181B0D7 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B545356DD7B2C47C2D3CF36D /* PDFExporter.swift */; };
 		58D1CF5047F1D9F84DF05BF6 /* RecentsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15518783BCA726EFB1A201D0 /* RecentsStore.swift */; };
+		5B0A690966FC718EDFD87261 /* AppLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3FFF921803E8AC84F4A190 /* AppLinks.swift */; };
 		5C54A65715FA20BDE79CE09F /* JetBrainsMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 42CA1C0FD6263B1CA615A128 /* JetBrainsMono-Regular.ttf */; };
 		5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */ = {isa = PBXBuildFile; fileRef = CE6818521117AE0878C221A4 /* highlight-github.css */; };
 		7E8A953592513F1414EF1CBB /* MarkflowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96448590D3A726722BFA597 /* MarkflowApp.swift */; };
@@ -28,6 +29,7 @@
 		915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFA675B2F8EB1DFB255B70F /* DocumentView.swift */; };
 		95917FD220A52275687202B6 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41EF046CA3EE526DBB1EA20C /* ShareSheet.swift */; };
 		A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */ = {isa = PBXBuildFile; fileRef = B5A3CDF1D48F9F8AF284318C /* highlight.min.js */; };
+		B39058A6266705803F5F6590 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 65EA095BC1F74475445C0606 /* PrivacyInfo.xcprivacy */; };
 		B773466CBF19542667484DBA /* iAWriterQuattroS-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34C6D8C3C173C89767EBE9C8 /* iAWriterQuattroS-Regular.ttf */; };
 		B93C8C70AED78809F171BDAE /* AccentColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5176ADC5810396E3CA3DA4FC /* AccentColor.swift */; };
 		CF272BC6F19DC1E40D9631DC /* JetBrainsMono-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C62487C474A094BE882CB47F /* JetBrainsMono-Bold.ttf */; };
@@ -49,6 +51,7 @@
 		42CA1C0FD6263B1CA615A128 /* JetBrainsMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "JetBrainsMono-Regular.ttf"; sourceTree = "<group>"; };
 		4B561E95D4411E64ACD65FFA /* preview.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = preview.html; sourceTree = "<group>"; };
 		5176ADC5810396E3CA3DA4FC /* AccentColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccentColor.swift; sourceTree = "<group>"; };
+		65EA095BC1F74475445C0606 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8C4279291B38384200DC0ED7 /* mermaid.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = mermaid.min.js; sourceTree = "<group>"; };
 		91C4B697C05D869057F0987D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9BD63FB0C10885B6AC27B18C /* marked.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = marked.min.js; sourceTree = "<group>"; };
@@ -64,6 +67,7 @@
 		CB884EA862099EAC0FCB4CAB /* ImagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerSheet.swift; sourceTree = "<group>"; };
 		CE6818521117AE0878C221A4 /* highlight-github.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = "highlight-github.css"; sourceTree = "<group>"; };
 		D14F24817E86AA8610867B5C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DA3FFF921803E8AC84F4A190 /* AppLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLinks.swift; sourceTree = "<group>"; };
 		E5DC9E1E126C7B4CC6F8D12F /* preview.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = preview.js; sourceTree = "<group>"; };
 		EBAAEBE32609775C2809550F /* iAWriterQuattroS-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iAWriterQuattroS-Bold.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -115,12 +119,14 @@
 			isa = PBXGroup;
 			children = (
 				5176ADC5810396E3CA3DA4FC /* AccentColor.swift */,
+				DA3FFF921803E8AC84F4A190 /* AppLinks.swift */,
 				91C4B697C05D869057F0987D /* Assets.xcassets */,
 				1F1EE986DBAB7D4A81C1346C /* ImageStore.swift */,
 				0C50858AC1E06350E38CB309 /* Info.plist */,
 				B96448590D3A726722BFA597 /* MarkflowApp.swift */,
 				B545356DD7B2C47C2D3CF36D /* PDFExporter.swift */,
 				BCA73EFC38D3A3EFCA1A4AE9 /* PreviewAssets.swift */,
+				65EA095BC1F74475445C0606 /* PrivacyInfo.xcprivacy */,
 				15518783BCA726EFB1A201D0 /* RecentsStore.swift */,
 				5E84B632DF95956E659CCA61 /* Resources */,
 				264C903D94BD91CE02E12307 /* Views */,
@@ -207,6 +213,7 @@
 				03662B17E01E8878C35E4F1C /* Assets.xcassets in Resources */,
 				CF272BC6F19DC1E40D9631DC /* JetBrainsMono-Bold.ttf in Resources */,
 				5C54A65715FA20BDE79CE09F /* JetBrainsMono-Regular.ttf in Resources */,
+				B39058A6266705803F5F6590 /* PrivacyInfo.xcprivacy in Resources */,
 				1ADE8FAF71612F864FEE8ECE /* highlight-github-dark.css in Resources */,
 				5CE0E8B0D0E971E5E99111EC /* highlight-github.css in Resources */,
 				A0DC83F5A72B30C24D9506AE /* highlight.min.js in Resources */,
@@ -228,6 +235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B93C8C70AED78809F171BDAE /* AccentColor.swift in Sources */,
+				5B0A690966FC718EDFD87261 /* AppLinks.swift in Sources */,
 				915F0ABFA148F03F984819DC /* DocumentView.swift in Sources */,
 				4FB2791CD85D2E0947812398 /* EditView.swift in Sources */,
 				E7440F9CBE19F192191DA3EF /* HomeView.swift in Sources */,

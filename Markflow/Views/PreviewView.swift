@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import UIKit
 
 struct PreviewView: UIViewRepresentable {
     let markdown: String
@@ -91,6 +92,10 @@ struct PreviewView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             isReady = true
             // Tell preview.js where to resolve relative image paths from.
+            // Always Documents/ — WKWebView's allowingReadAccessTo is scoped
+            // there, so loading file:// images from elsewhere on the device
+            // would silently fail. External sibling-image rendering is a
+            // separate feature that requires WKURLSchemeHandler (v0.3.0).
             let basePath = "file://" + PreviewAssets.documentsURL.path + "/"
             let escapedBase = PreviewView.jsonString(from: basePath)
             webView.evaluateJavaScript("window.imageBasePath = \(escapedBase);", completionHandler: nil)
@@ -104,6 +109,28 @@ struct PreviewView: UIViewRepresentable {
 
             let escaped = PreviewView.jsonString(from: pendingMarkdown)
             webView.evaluateJavaScript("render(\(escaped))", completionHandler: nil)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard navigationAction.navigationType == .linkActivated,
+                  let url = navigationAction.request.url else {
+                decisionHandler(.allow)
+                return
+            }
+
+            if url.isFileURL {
+                decisionHandler(.allow)
+                return
+            }
+
+            decisionHandler(.cancel)
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
         }
     }
 }

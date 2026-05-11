@@ -37,9 +37,22 @@ User feedback round driven by a fan letter listing 4 issues + 2 feature requests
 - **Bundled fonts** — `Markflow/Resources/fonts/` ships iA Writer Quattro S (Regular + Bold) and JetBrains Mono (Regular + Bold), all SIL OFL. Registered in `Info.plist` `UIAppFonts`. Also mirrored to `Documents/preview/` with `@font-face` declarations in `preview.html` for WebKit consumption.
 - **Build infrastructure** — `CURRENT_PROJECT_VERSION` 2 → 5 over the session (3, 4, 5 to force PreviewAssets re-mirror after preview.html / fonts changes).
 
+### App Store hardening (added in companion session)
+
+- **`PrivacyInfo.xcprivacy`** — required by Apple since May 2024. Declares `NSPrivacyTracking = false`, empty `NSPrivacyCollectedDataTypes`, and required-reason API usage for UserDefaults (`CA92.1` — App functionality). Wired into the bundle via `project.yml`'s `resources:` array.
+- **Markdown sanitizer** — `preview.js` `sanitizeRenderedMarkdown(root)` strips `<script>`, `<iframe>`, `<form>`, etc.; removes inline event handlers + `srcdoc`; nukes `javascript:` / `vbscript:` URLs from `href` / `src`; adds `rel="noreferrer noopener"` to all links.
+- **Mermaid security level → strict** — `securityLevel: 'loose'` → `'strict'`, `htmlLabels: false`. Closes the "raw HTML in mermaid labels" attack vector.
+- **CSP `img-src` adds `file:`** — required since Markflow loads images via file:// URLs.
+- **External-link navigation delegate** — `PreviewView.WKNavigationDelegate.decidePolicyFor` opens user-tapped non-file URLs externally via `UIApplication.shared.open()`. Without this, tapping a link in preview would replace the rendered HTML with the destination page.
+- **`AppLinks.swift`** — centralizes website / support / privacy URL strings with safe `URL(string:)` construction. HomeView credit + SettingsView About section render only when URL construction succeeds.
+
+### Reverted
+
+- Initial attempt to set image base path to source's parent directory (so external sibling images would render in preview) — incomplete because WKWebView's `loadFileURL(allowingReadAccessTo:)` is scoped to Documents/, so file:// loads outside that scope are silently blocked. Reverted to always-Documents/ base path. Proper fix requires `WKURLSchemeHandler` (deferred to v0.3.0).
+
 ### Code organization
 
-- New files: `AccentColor.swift` (theme/font/appearance/file-mode enums + HexColor helper), `RecentsStore.swift` (`@Observable` singleton + bookmark mgmt), `ImageStore.swift` (PNG/JPEG save with UUID prefix), `PreviewAssets.swift` (asset mirror), `PDFExporter.swift` (off-screen WKWebView + WKScriptMessageHandler), `Views/SettingsView.swift`, `Views/ImagePickerSheet.swift`, `Views/ShareSheet.swift` (UIActivityViewController wrapper + `IdentifiableURL`).
+- New files: `AccentColor.swift` (theme/font/appearance/file-mode enums + HexColor helper), `RecentsStore.swift` (`@Observable` singleton + bookmark mgmt), `ImageStore.swift` (PNG/JPEG save with UUID prefix), `PreviewAssets.swift` (asset mirror), `PDFExporter.swift` (off-screen WKWebView + WKScriptMessageHandler), `AppLinks.swift` (centralized URLs), `PrivacyInfo.xcprivacy` (App Store privacy manifest), `Views/SettingsView.swift`, `Views/ImagePickerSheet.swift`, `Views/ShareSheet.swift` (UIActivityViewController wrapper + `IdentifiableURL`).
 
 ---
 

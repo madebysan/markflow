@@ -23,8 +23,8 @@
           window.mermaid.initialize({
             startOnLoad: false,
             theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
-            securityLevel: 'loose',
-            flowchart: { htmlLabels: true, curve: 'basis' }
+            securityLevel: 'strict',
+            flowchart: { htmlLabels: false, curve: 'basis' }
           });
         } catch (e) { console.error('mermaid init failed:', e); }
         resolve();
@@ -91,6 +91,33 @@
     });
   }
 
+  function sanitizeRenderedMarkdown(root) {
+    const blockedTags = new Set([
+      'SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'INPUT', 'BUTTON',
+      'TEXTAREA', 'SELECT', 'OPTION', 'META', 'LINK', 'BASE', 'STYLE'
+    ]);
+    root.querySelectorAll('*').forEach((node) => {
+      if (blockedTags.has(node.tagName)) {
+        node.remove();
+        return;
+      }
+      for (const attr of Array.from(node.attributes)) {
+        const name = attr.name.toLowerCase();
+        const value = (attr.value || '').trim().toLowerCase();
+        if (name.startsWith('on') || name === 'srcdoc') {
+          node.removeAttribute(attr.name);
+          continue;
+        }
+        if ((name === 'href' || name === 'src') && /^(javascript|vbscript):/.test(value)) {
+          node.removeAttribute(attr.name);
+        }
+      }
+      if (node.tagName === 'A') {
+        node.setAttribute('rel', 'noreferrer noopener');
+      }
+    });
+  }
+
   // Expose render() for Swift to call via evaluateJavaScript
   let mermaidCounter = 0;
   window.render = async function(md) {
@@ -101,6 +128,7 @@
     }
     try {
       el.innerHTML = marked.parse(md);
+      sanitizeRenderedMarkdown(el);
 
       rewriteImageSources(el);
 

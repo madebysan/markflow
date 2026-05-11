@@ -130,9 +130,15 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Link("santiagoalonso.com", destination: URL(string: "https://santiagoalonso.com")!)
-                    Link("Support", destination: URL(string: "https://github.com/madebysan/markflow/blob/main/docs/support.md")!)
-                    Link("Privacy", destination: URL(string: "https://github.com/madebysan/markflow/blob/main/docs/privacy-policy.md")!)
+                    if let website = AppLinks.url(AppLinks.website) {
+                        Link("santiagoalonso.com", destination: website)
+                    }
+                    if let support = AppLinks.url(AppLinks.support) {
+                        Link("Support", destination: support)
+                    }
+                    if let privacy = AppLinks.url(AppLinks.privacy) {
+                        Link("Privacy", destination: privacy)
+                    }
                 } header: {
                     Text("About")
                 }
