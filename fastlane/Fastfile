@@ -1,0 +1,84 @@
+default_platform(:ios)
+
+require "json"
+API_KEY = JSON.parse(File.read(File.expand_path("~/private_keys/api_key.json")))
+
+PROJECT = "Markflow.xcodeproj"
+SCHEME  = "Markflow"
+
+platform :ios do
+  before_all do
+    ENV["FASTLANE_HIDE_CHANGELOG"] = "1"
+    ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "1"
+  end
+
+  desc "Pre-flight checks"
+  lane :preflight do
+    project_root = File.expand_path("..", __dir__)
+    issues = []
+
+    # Encryption flag — handled via Info.plist (we use GENERATE_INFOPLIST_FILE=NO,
+    # so the key lives in Markflow/Info.plist, not pbxproj). Verify it's there.
+    info_plist = File.join(project_root, "Markflow/Info.plist")
+    unless File.read(info_plist).include?("ITSAppUsesNonExemptEncryption")
+      issues << "Missing ITSAppUsesNonExemptEncryption in Info.plist"
+    end
+
+    # App icon must be opaque (Apple rejects alpha — error 90717).
+    Dir.glob(File.join(project_root, "**/AppIcon.appiconset/*.png")).each do |icon|
+      out = `/usr/bin/sips -g hasAlpha "#{icon}" 2>/dev/null`
+      if out.include?("hasAlpha: yes")
+        issues << "App icon has alpha: #{icon.sub(project_root + '/', '')}"
+      end
+    end
+
+    if issues.empty?
+      UI.success("Pre-flight passed.")
+    else
+      UI.user_error!("Pre-flight failed:\n  - #{issues.join("\n  - ")}")
+    end
+  end
+
+  desc "Archive + export signed IPA (Apple Distribution)"
+  lane :build do
+    app_store_connect_api_key(
+      key_id: API_KEY["key_id"],
+      issuer_id: API_KEY["issuer_id"],
+      key_filepath: API_KEY["key_filepath"],
+      duration: API_KEY["duration"] || 1200,
+      in_house: false
+    )
+
+    build_app(
+      project: PROJECT,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build",
+      output_name: "#{SCHEME}.ipa",
+      clean: true,
+      xcargs: "-allowProvisioningUpdates",
+      export_options: { signingStyle: "automatic" }
+    )
+  end
+
+  desc "Upload IPA to App Store Connect"
+  lane :upload do
+    api_key = app_store_connect_api_key(
+      key_id: API_KEY["key_id"],
+      issuer_id: API_KEY["issuer_id"],
+      key_filepath: API_KEY["key_filepath"],
+      duration: API_KEY["duration"] || 1200,
+      in_house: false
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      ipa: "build/#{SCHEME}.ipa",
+      skip_metadata: true,
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false,
+      submit_for_review: false
+    )
+  end
+end

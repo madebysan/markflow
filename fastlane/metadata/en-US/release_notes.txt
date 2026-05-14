@@ -1,0 +1,21 @@
+v0.2.0 — Themes, fonts, and a lot more
+
+NEW
+• Pick from 5 color themes (Indigo, Forest, Sunset, Ocean, Graphite). Each is tuned for both light and dark mode.
+• Switch between System, Light, and Dark from Settings.
+• Choose your reading font: System, Rounded, Charter, Monospace, iA Writer, or JetBrains Mono.
+• Editor and Preview font sizes are independently adjustable.
+• Recent files appear on the Home screen.
+• Insert images directly into your markdown via the photo picker. On Save, images are copied next to your .md file so they render in any other markdown app too.
+• Export any document as a PDF.
+• Filename shows in the nav bar. Tap the menu to rename in place.
+
+POLISHED
+• Floating glass toolbar in the editor with larger touch targets and a working hide-keyboard button.
+• Single-icon mode toggle: tap the eye to read, pencil to write.
+• Swipe from the left edge to dismiss any open document.
+• Settings shortcut from inside any document's menu.
+• Softer light/dark home palette.
+
+PRIVACY
+Markflow continues to make zero network requests and collect no data. This release ships with the App Store privacy manifest.
