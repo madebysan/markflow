@@ -1,24 +1,22 @@
+<p><img src="docs/icon.png" width="128" height="128" alt="Markflow icon"></p>
 
-<p align="center">
-  <img src="docs/icon.png" width="128" height="128" alt="Markflow icon">
-</p>
-<h1 align="center">Markflow</h1>
-<p align="center">Simple on-the-go markdown reader and editor for iOS.</p>
-<p align="center"><strong>Version 0.2.0</strong> · iOS 26 · SwiftUI</p>
+<h1>Markflow</h1>
 
-<p align="center">
-  <a href="https://apps.apple.com/us/app/markflow-markdown-reader/id6763440990">
-    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="50">
-  </a>
-</p>
+<p>Simple on-the-go markdown reader and editor for iOS.</p>
 
----
+<p><strong>Version 0.2.0</strong> · iOS 26 · SwiftUI</p>
 
-<p align="center">
-  <img src="docs/screenshots/hero.png" width="100%" alt="Markflow app screenshots">
+<p>
+  <img src="https://img.shields.io/badge/Swift-f05138" alt="Swift">
+  <img src="https://img.shields.io/badge/SwiftUI-0066cc" alt="SwiftUI">
+  <img src="https://img.shields.io/badge/iOS-000000" alt="iOS">
 </p>
 
----
+<p>
+  <a href="https://apps.apple.com/us/app/markflow-markdown-reader/id6763440990"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="50"></a>
+</p>
+
+![Markflow app screenshots](docs/screenshots/hero.png)
 
 Markflow is a native markdown reader and editor for iOS 26. Tap any `.md` file in Files, Mail, or Safari and it opens rendered: code blocks, mermaid diagrams, tables, inline images. Files open read-only by default and edits live in memory until you explicitly choose Save, Save as New File, or Share.
 
