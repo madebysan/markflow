@@ -1,0 +1,176 @@
+(function() {
+  // Swap highlight.js theme based on color scheme
+  function applyHljsTheme() {
+    const link = document.getElementById('hljs-theme');
+    if (!link) return;
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    link.href = dark ? 'highlight-github-dark.css' : 'highlight-github.css';
+  }
+  applyHljsTheme();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
+
+  // Mermaid is loaded on-demand only when a ```mermaid block is present.
+  let mermaidLoader = null;
+  function ensureMermaid() {
+    if (window.mermaid) return Promise.resolve();
+    if (mermaidLoader) return mermaidLoader;
+    mermaidLoader = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'mermaid.min.js';
+      s.async = true;
+      s.onload = () => {
+        try {
+          window.mermaid.initialize({
+            startOnLoad: false,
+            theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default',
+            securityLevel: 'strict',
+            flowchart: { htmlLabels: false, curve: 'basis' }
+          });
+        } catch (e) { console.error('mermaid init failed:', e); }
+        resolve();
+      };
+      s.onerror = () => {
+        mermaidLoader = null;
+        reject(new Error('mermaid.min.js failed to load'));
+      };
+      document.head.appendChild(s);
+    });
+    return mermaidLoader;
+  }
+
+  // Custom marked renderer — emit mermaid blocks as <pre class="mermaid">
+  // so mermaid's run() picks them up, and skip hljs for them.
+  const renderer = new marked.Renderer();
+  const defaultCode = renderer.code.bind(renderer);
+  renderer.code = function(code, lang, escaped) {
+    // marked v15 passes a token object; normalize
+    let text, language;
+    if (typeof code === 'object' && code !== null) {
+      text = code.text;
+      language = code.lang;
+    } else {
+      text = code;
+      language = lang;
+    }
+    if (language === 'mermaid') {
+      // Mermaid needs the raw source in the element
+      return '<pre class="mermaid">' + escapeHtml(text) + '</pre>\n';
+    }
+    // Let marked handle non-mermaid code; hljs highlights it after innerHTML
+    return defaultCode(code, lang, escaped);
+  };
+
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  marked.use({ renderer, breaks: true, gfm: true });
+
+  // Called from Swift to apply user's font preferences before rendering.
+  window.setFontPreferences = function(family, stretch, sizePx) {
+    const root = document.documentElement.style;
+    if (family) root.setProperty('--body-font', family);
+    if (stretch) root.setProperty('--body-font-stretch', stretch);
+    if (sizePx) root.setProperty('--body-font-size', sizePx + 'px');
+  };
+
+  // Rewrite relative <img src> paths to absolute file:// URLs scoped to
+  // window.imageBasePath (set from Swift). Leaves absolute URLs alone.
+  function rewriteImageSources(root) {
+    if (!window.imageBasePath) return;
+    root.querySelectorAll('img').forEach((img) => {
+      const src = img.getAttribute('src') || '';
+      if (!src) return;
+      if (/^(https?:|file:|data:|\/)/.test(src)) return;
+      img.setAttribute('src', window.imageBasePath + src);
+    });
+  }
+
+  function isTaskCheckbox(node) {
+    return node.tagName === 'INPUT' &&
+      (node.getAttribute('type') || '').toLowerCase() === 'checkbox' &&
+      node.parentElement !== null && node.parentElement.tagName === 'LI' &&
+      Array.from(node.attributes).every((attr) =>
+        ['type', 'checked', 'disabled', 'class'].includes(attr.name.toLowerCase()));
+  }
+
+  function sanitizeRenderedMarkdown(root) {
+    const blockedTags = new Set([
+      'SCRIPT', 'IFRAME', 'OBJECT', 'EMBED', 'FORM', 'INPUT', 'BUTTON',
+      'TEXTAREA', 'SELECT', 'OPTION', 'META', 'LINK', 'BASE', 'STYLE'
+    ]);
+    root.querySelectorAll('*').forEach((node) => {
+      // GFM task lists ("- [x] item") are the one input allowed: a read-only
+      // checkbox. Everything else in blockedTags is removed.
+      if (isTaskCheckbox(node)) {
+        node.setAttribute('disabled', '');
+        const item = node.closest('li');
+        if (item) {
+          item.classList.add('task-list-item');
+          if (item.parentElement) item.parentElement.classList.add('contains-task-list');
+        }
+        return;
+      }
+      if (blockedTags.has(node.tagName)) {
+        node.remove();
+        return;
+      }
+      for (const attr of Array.from(node.attributes)) {
+        const name = attr.name.toLowerCase();
+        const value = (attr.value || '').trim().toLowerCase();
+        if (name.startsWith('on') || name === 'srcdoc') {
+          node.removeAttribute(attr.name);
+          continue;
+        }
+        if ((name === 'href' || name === 'src') && /^(javascript|vbscript):/.test(value)) {
+          node.removeAttribute(attr.name);
+        }
+      }
+      if (node.tagName === 'A') {
+        node.setAttribute('rel', 'noreferrer noopener');
+      }
+    });
+  }
+
+  // Expose render() for Swift to call via evaluateJavaScript
+  let mermaidCounter = 0;
+  window.render = async function(md) {
+    const el = document.getElementById('content');
+    if (!md || md.length === 0) {
+      el.innerHTML = '<div id="empty">Nothing here yet — tap Edit to start.</div>';
+      return;
+    }
+    try {
+      el.innerHTML = marked.parse(md);
+      sanitizeRenderedMarkdown(el);
+
+      rewriteImageSources(el);
+
+      // Syntax highlight any language-* code blocks (skip mermaid)
+      el.querySelectorAll('pre code[class*="language-"]').forEach((block) => {
+        try { hljs.highlightElement(block); } catch (e) {}
+      });
+
+      // Render mermaid diagrams — lazy-load the library on first use
+      const mermaidBlocks = el.querySelectorAll('pre.mermaid');
+      if (mermaidBlocks.length > 0) {
+        try {
+          await ensureMermaid();
+          mermaidBlocks.forEach((b) => {
+            b.id = 'mermaid-' + (++mermaidCounter);
+          });
+          await window.mermaid.run({ nodes: mermaidBlocks });
+        } catch (e) {
+          console.error('mermaid error:', e);
+        }
+      }
+    } catch (e) {
+      el.innerText = String(e);
+    }
+  };
+})();

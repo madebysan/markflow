@@ -1,0 +1,151 @@
+import SwiftUI
+import WebKit
+import UIKit
+
+struct PreviewView: UIViewRepresentable {
+    let markdown: String
+    /// The open file, so relative images can load from its folder.
+    var documentURL: URL?
+    /// Bumped when the user grants folder access, to reload images.
+    var folderAccessVersion: Int = 0
+
+    @AppStorage(AppPreferences.documentFontKey) private var fontRaw: String = DocumentFont.system.rawValue
+    @AppStorage(AppPreferences.previewFontSizeKey) private var previewFontSize: Double = 17
+
+    private var font: DocumentFont {
+        DocumentFont(rawValue: fontRaw) ?? .system
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        config.defaultWebpagePreferences.allowsContentJavaScript = true
+        context.coordinator.imageHandler.folder = FolderAccess.imageFolder(for: documentURL)
+        context.coordinator.folderAccessVersion = folderAccessVersion
+        context.coordinator.documentURL = documentURL
+        config.setURLSchemeHandler(context.coordinator.imageHandler, forURLScheme: DocumentImageSchemeHandler.scheme)
+
+        let webView = WKWebView(frame: .zero, configuration: config)
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        webView.navigationDelegate = context.coordinator
+
+        // Pinch-to-zoom
+        webView.scrollView.minimumZoomScale = 1.0
+        webView.scrollView.maximumZoomScale = 5.0
+        webView.scrollView.bouncesZoom = true
+
+        context.coordinator.webView = webView
+
+        loadTemplate(into: webView)
+        context.coordinator.pendingMarkdown = markdown
+
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        context.coordinator.pendingMarkdown = markdown
+        context.coordinator.pendingFont = font
+        context.coordinator.pendingFontSize = previewFontSize
+        // The document URL can arrive after the view is made, and a granted
+        // folder changes what may be read: refresh where images come from.
+        if context.coordinator.folderAccessVersion != folderAccessVersion
+            || context.coordinator.documentURL != documentURL {
+            context.coordinator.folderAccessVersion = folderAccessVersion
+            context.coordinator.documentURL = documentURL
+            context.coordinator.imageHandler.folder = FolderAccess.imageFolder(for: documentURL)
+        }
+        if context.coordinator.isReady {
+            applyFontPreferences(in: webView)
+            render(markdown: markdown, in: webView)
+        }
+    }
+
+    private func applyFontPreferences(in webView: WKWebView) {
+        // jsonString returns a string already wrapped in JS quotes —
+        // interpolate it directly, do not add extra surrounding quotes.
+        let family = Self.jsonString(from: font.cssFamily)
+        let stretch = Self.jsonString(from: font.cssStretch)
+        let js = "setFontPreferences(\(family), \(stretch), \(Int(previewFontSize)))"
+        webView.evaluateJavaScript(js, completionHandler: nil)
+    }
+
+    private func loadTemplate(into webView: WKWebView) {
+        let url = PreviewAssets.previewHTMLURL
+        // Grant read access to the whole Documents folder so images saved
+        // under Documents/images/ can be loaded by the page.
+        webView.loadFileURL(url, allowingReadAccessTo: PreviewAssets.documentsURL)
+    }
+
+    private func render(markdown: String, in webView: WKWebView) {
+        let escaped = Self.jsonString(from: markdown)
+        webView.evaluateJavaScript("render(\(escaped))", completionHandler: nil)
+    }
+
+    private static func jsonString(from value: String) -> String {
+        guard let data = try? JSONEncoder().encode([value]),
+              let json = String(data: data, encoding: .utf8),
+              json.count >= 2
+        else {
+            return "\"\""
+        }
+        let trimmed = String(json.dropFirst().dropLast())
+        return trimmed
+    }
+
+    final class Coordinator: NSObject, WKNavigationDelegate {
+        weak var webView: WKWebView?
+        var pendingMarkdown: String = ""
+        var pendingFont: DocumentFont = .system
+        var pendingFontSize: Double = 17
+        var isReady: Bool = false
+        let imageHandler = DocumentImageSchemeHandler()
+        var folderAccessVersion = 0
+        var documentURL: URL?
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            isReady = true
+            // Relative image paths load through DocumentImageSchemeHandler:
+            // from the document's folder when Markflow may read it, then from
+            // Documents/, where images inserted in the app live.
+            let escapedBase = PreviewView.jsonString(from: DocumentImageSchemeHandler.basePath)
+            webView.evaluateJavaScript("window.imageBasePath = \(escapedBase);", completionHandler: nil)
+
+            let family = PreviewView.jsonString(from: pendingFont.cssFamily)
+            let stretch = PreviewView.jsonString(from: pendingFont.cssStretch)
+            webView.evaluateJavaScript(
+                "setFontPreferences(\(family), \(stretch), \(Int(pendingFontSize)))",
+                completionHandler: nil
+            )
+
+            let escaped = PreviewView.jsonString(from: pendingMarkdown)
+            webView.evaluateJavaScript("render(\(escaped))", completionHandler: nil)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard navigationAction.navigationType == .linkActivated,
+                  let url = navigationAction.request.url else {
+                decisionHandler(.allow)
+                return
+            }
+
+            if url.isFileURL {
+                decisionHandler(.allow)
+                return
+            }
+
+            decisionHandler(.cancel)
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
+    }
+}

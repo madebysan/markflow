@@ -1,0 +1,531 @@
+import SwiftUI
+import UniformTypeIdentifiers
+
+struct DocumentView: View {
+    let documentText: String
+    let sourceURL: URL?
+    let onClose: () -> Void
+
+    @AppStorage(AppPreferences.newFileModeKey) private var newFileModeRaw: String = NewFileMode.edit.rawValue
+    @AppStorage(AppPreferences.documentFontKey) private var fontRaw: String = DocumentFont.system.rawValue
+    @AppStorage(AppPreferences.previewFontSizeKey) private var previewFontSize: Double = 17
+
+    @State private var mode: Mode = .preview
+    @State private var workingText: String = ""
+    @State private var didInit: Bool = false
+    @State private var pdfShareItem: IdentifiableURL?
+    @State private var exportingPDF: Bool = false
+
+    @State private var currentURL: URL?
+    @State private var displayName: String = "Untitled.md"
+
+    @State private var showExitConfirmation: Bool = false
+    @State private var showExporter: Bool = false
+    @State private var showRenameAlert: Bool = false
+    @State private var renameInput: String = ""
+    @State private var saveAlert: SaveAlert?
+    @State private var showSettings: Bool = false
+    @State private var showFolderPicker: Bool = false
+    @State private var folderAccessVersion: Int = 0
+    @State private var needsFolderAccess: Bool = false
+
+    @State private var swipeOffset: CGFloat = 0
+    private let edgeThreshold: CGFloat = 24
+    private let dismissThreshold: CGFloat = 90
+
+    enum Mode: String, CaseIterable, Identifiable {
+        case preview, edit
+        var id: String { rawValue }
+        var label: String {
+            switch self {
+            case .preview: return "Preview"
+            case .edit: return "Edit"
+            }
+        }
+    }
+
+    var body: some View {
+        content
+            .navigationTitle(displayName)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbarBackground(.automatic, for: .navigationBar)
+            .onAppear(perform: initializeOnFirstAppear)
+            .toolbar { toolbarContent }
+            .overlay(alignment: .bottom) {
+                VStack(spacing: 12) {
+                    if mode == .preview && needsFolderAccess {
+                        folderAccessPrompt
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    modeTogglePill
+                }
+                .padding(.bottom, 10)
+            }
+            .onChange(of: mode) { refreshFolderAccess() }
+            .onChange(of: currentURL) { refreshFolderAccess() }
+            .sheet(isPresented: $showFolderPicker) {
+                FolderPicker(startingAt: currentURL?.deletingLastPathComponent()) { folder in
+                    grantFolder(folder)
+                }
+                .ignoresSafeArea()
+            }
+            .offset(x: swipeOffset)
+            .simultaneousGesture(swipeBackGesture)
+            .confirmationDialog(
+                "Unsaved changes",
+                isPresented: $showExitConfirmation,
+                titleVisibility: .visible
+            ) {
+                exitConfirmationActions
+            } message: {
+                Text(exitConfirmationMessage)
+            }
+            .fileExporter(
+                isPresented: $showExporter,
+                document: MarkdownFileDocument(text: workingText),
+                contentType: markdownType,
+                defaultFilename: newFileDefaultName,
+                onCompletion: handleExporterResult
+            )
+            .alert("Rename", isPresented: $showRenameAlert) {
+                TextField("Name", text: $renameInput)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Button("Rename") { performRename() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(currentURL != nil
+                    ? "Rename will move the file in place."
+                    : "Sets the suggested name when you save this file.")
+            }
+            .alert(
+                saveAlert?.title ?? "",
+                isPresented: saveAlertBinding,
+                presenting: saveAlert
+            ) { _ in
+                Button("OK", role: .cancel) {}
+            } message: { alert in
+                Text(alert.message)
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
+            .sheet(item: $pdfShareItem) { item in
+                ShareSheet(items: [item.url])
+            }
+    }
+
+    private func exportPDF() {
+        guard !exportingPDF else { return }
+        exportingPDF = true
+        let font = DocumentFont(rawValue: fontRaw) ?? .system
+        PDFExporter.export(
+            markdown: workingText,
+            font: font,
+            fontSize: previewFontSize,
+            title: displayName
+        ) { result in
+            exportingPDF = false
+            switch result {
+            case .success(let url):
+                pdfShareItem = IdentifiableURL(url: url)
+            case .failure(let error):
+                saveAlert = SaveAlert(
+                    title: "Couldn't export PDF",
+                    message: error.localizedDescription
+                )
+            }
+        }
+    }
+
+    // MARK: - Body fragments
+
+    @ViewBuilder
+    private var content: some View {
+        switch mode {
+        case .preview:
+            PreviewView(markdown: workingText, documentURL: currentURL, folderAccessVersion: folderAccessVersion)
+        case .edit:
+            EditView(text: $workingText)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button(action: attemptClose) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .accessibilityLabel("Close")
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            Menu {
+                Button {
+                    renameTapped()
+                } label: {
+                    Label("Rename", systemImage: "pencil")
+                }
+
+                Button {
+                    showExporter = true
+                } label: {
+                    Label("Save to Files", systemImage: "square.and.arrow.down")
+                }
+
+                ShareLink(
+                    item: MarkdownExport(filename: exportFileName, text: workingText),
+                    preview: SharePreview(exportFileName)
+                ) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+
+                Button {
+                    exportPDF()
+                } label: {
+                    Label("Export as PDF", systemImage: "doc.richtext")
+                }
+                .disabled(exportingPDF || workingText.isEmpty)
+
+                Divider()
+
+                Button {
+                    showSettings = true
+                } label: {
+                    Label("Settings", systemImage: "gearshape")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .accessibilityLabel("More options")
+        }
+    }
+
+    private var swipeBackGesture: some Gesture {
+        DragGesture(minimumDistance: 8, coordinateSpace: .global)
+            .onChanged { value in
+                guard value.startLocation.x < edgeThreshold else { return }
+                swipeOffset = max(0, value.translation.width)
+            }
+            .onEnded { value in
+                let startedAtEdge = value.startLocation.x < edgeThreshold
+                let pastThreshold = value.translation.width > dismissThreshold
+                if startedAtEdge && pastThreshold {
+                    attemptClose()
+                } else {
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.85)) {
+                        swipeOffset = 0
+                    }
+                }
+            }
+    }
+
+    /// Shown when the file refers to images in its folder that iOS hasn't
+    /// let Markflow read yet. One pick of the folder covers it from then on.
+    private var folderAccessPrompt: some View {
+        Button {
+            showFolderPicker = true
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "photo.on.rectangle")
+                Text("Show images from this file's folder")
+                    .font(.system(size: 15, weight: .medium))
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 16)
+            .frame(height: 40)
+            .background(
+                Capsule()
+                    .fill(.regularMaterial)
+                    .overlay(Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
+                    .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opens the folder picker. Choose the folder that holds this file.")
+    }
+
+    private func refreshFolderAccess() {
+        let needed = FolderAccess.needsFolderAccess(documentURL: currentURL, markdown: workingText)
+        withAnimation(.easeOut(duration: 0.2)) { needsFolderAccess = needed }
+    }
+
+    private func grantFolder(_ folder: URL) {
+        let scoped = folder.startAccessingSecurityScopedResource()
+        defer { if scoped { folder.stopAccessingSecurityScopedResource() } }
+        let folderPath = folder.standardizedFileURL.path
+        let filePath = currentURL?.deletingLastPathComponent().standardizedFileURL.path ?? ""
+        guard filePath == folderPath || filePath.hasPrefix(folderPath + "/") else {
+            saveAlert = SaveAlert(
+                title: "That folder doesn't contain this file",
+                message: "Choose the folder this file is in, or one that contains it."
+            )
+            return
+        }
+        FolderAccess.grant(folder)
+        folderAccessVersion += 1
+        refreshFolderAccess()
+    }
+
+    private var modeTogglePill: some View {
+        Button {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                mode = (mode == .preview) ? .edit : .preview
+            }
+        } label: {
+            Image(systemName: mode == .preview ? "pencil" : "eye")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.primary)
+                .frame(width: 48, height: 48)
+                .contentTransition(.symbolEffect(.replace))
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            Circle().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
+                        )
+                        .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
+                )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(mode == .preview ? "Switch to Edit" : "Switch to Preview")
+    }
+
+    @ViewBuilder
+    private var exitConfirmationActions: some View {
+        if currentURL != nil {
+            Button("Save") { saveToSource() }
+        }
+        Button("Save as New File…") { showExporter = true }
+        Button("Discard Changes", role: .destructive) { onClose() }
+        Button("Cancel", role: .cancel) {}
+    }
+
+    // MARK: - Derived
+
+    private var hasUnsavedChanges: Bool {
+        workingText != documentText
+    }
+
+    private var exportFileName: String {
+        "\(baseName)-edited.md"
+    }
+
+    private var newFileDefaultName: String {
+        baseName == "Untitled" ? "Untitled" : "\(baseName)-copy"
+    }
+
+    private var baseName: String {
+        let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty { return "Untitled" }
+        let url = URL(fileURLWithPath: trimmed)
+        let base = url.deletingPathExtension().lastPathComponent
+        return base.isEmpty ? "Untitled" : base
+    }
+
+    private var markdownType: UTType {
+        UTType("net.daringfireball.markdown") ?? .plainText
+    }
+
+    private var exitConfirmationMessage: String {
+        currentURL != nil
+            ? "“Save” writes over the original. “Save as New File” keeps the original untouched."
+            : "Pick a location to save your new markdown file, or discard your work."
+    }
+
+    private var saveAlertBinding: Binding<Bool> {
+        Binding(
+            get: { saveAlert != nil },
+            set: { if !$0 { saveAlert = nil } }
+        )
+    }
+
+    // MARK: - Actions
+
+    private func initializeOnFirstAppear() {
+        guard !didInit else { return }
+        workingText = documentText
+        currentURL = sourceURL
+        displayName = sourceURL?.lastPathComponent ?? "Untitled.md"
+
+        if sourceURL == nil {
+            // New document — honor the user's "New file mode" preference.
+            let preference = NewFileMode(rawValue: newFileModeRaw) ?? .edit
+            mode = preference == .preview ? .preview : .edit
+        } else {
+            mode = .preview
+        }
+
+        didInit = true
+        refreshFolderAccess()
+    }
+
+    private func attemptClose() {
+        if hasUnsavedChanges {
+            showExitConfirmation = true
+        } else {
+            onClose()
+        }
+    }
+
+    private func saveToSource() {
+        guard let url = currentURL else { return }
+        do {
+            try workingText.write(to: url, atomically: true, encoding: .utf8)
+            copyReferencedImagesAlongside(documentURL: url)
+            onClose()
+        } catch {
+            saveAlert = SaveAlert(
+                title: "Couldn't save",
+                message: "\(error.localizedDescription)\n\nTry again, or use “Save as New File” to pick a different location."
+            )
+        }
+    }
+
+    /// Copies any `images/<filename>` referenced by the markdown from the app's
+    /// Documents/images folder to a sibling `images/` folder next to the saved
+    /// .md file — so other markdown apps can resolve the relative paths too.
+    /// Silent on failure (e.g. read-only parent directory).
+    private func copyReferencedImagesAlongside(documentURL: URL) {
+        let pattern = #"!\[[^\]]*\]\(images/([^)]+)\)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
+        let nsText = workingText as NSString
+        let matches = regex.matches(in: workingText, range: NSRange(location: 0, length: nsText.length))
+        guard !matches.isEmpty else { return }
+
+        let parentDir = documentURL.deletingLastPathComponent()
+        let destImagesDir = parentDir.appendingPathComponent("images", isDirectory: true)
+        let fm = FileManager.default
+
+        do {
+            if !fm.fileExists(atPath: destImagesDir.path) {
+                try fm.createDirectory(at: destImagesDir, withIntermediateDirectories: true)
+            }
+        } catch {
+            return  // Couldn't create folder — likely read-only parent, give up.
+        }
+
+        var copied = Set<String>()
+        for match in matches {
+            guard match.numberOfRanges > 1 else { continue }
+            let filename = nsText.substring(with: match.range(at: 1))
+                .removingPercentEncoding ?? nsText.substring(with: match.range(at: 1))
+            if copied.contains(filename) { continue }
+            copied.insert(filename)
+
+            let src = ImageStore.folderURL.appendingPathComponent(filename)
+            let dst = destImagesDir.appendingPathComponent(filename)
+            guard fm.fileExists(atPath: src.path) else { continue }
+            if !fm.fileExists(atPath: dst.path) {
+                try? fm.copyItem(at: src, to: dst)
+            }
+        }
+    }
+
+    private func renameTapped() {
+        renameInput = baseName
+        showRenameAlert = true
+    }
+
+    private func performRename() {
+        let newBase = renameInput.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !newBase.isEmpty else { return }
+        let safeBase = sanitize(newBase)
+        let newFilename = safeBase.hasSuffix(".md") ? safeBase : "\(safeBase).md"
+
+        if let url = currentURL {
+            let newURL = url.deletingLastPathComponent().appendingPathComponent(newFilename)
+            guard newURL != url else { return }
+            do {
+                try FileManager.default.moveItem(at: url, to: newURL)
+                currentURL = newURL
+                displayName = newFilename
+            } catch {
+                saveAlert = SaveAlert(
+                    title: "Couldn't rename",
+                    message: "\(error.localizedDescription)\n\nThe original file may be in a location Markflow can't write to. Try “Save to Files” to save a renamed copy."
+                )
+            }
+        } else {
+            displayName = newFilename
+        }
+    }
+
+    private func sanitize(_ input: String) -> String {
+        let invalid = CharacterSet(charactersIn: "/\\:?*\"<>|")
+        return input.components(separatedBy: invalid).joined(separator: "-")
+    }
+
+    private func handleExporterResult(_ result: Result<URL, Error>) {
+        switch result {
+        case .success(let url):
+            copyReferencedImagesAlongside(documentURL: url)
+            onClose()
+        case .failure(let error):
+            let nsError = error as NSError
+            if nsError.code == NSUserCancelledError { return }
+            saveAlert = SaveAlert(
+                title: "Couldn't save",
+                message: "\(error.localizedDescription)\n\nTry again, or pick a different location."
+            )
+        }
+    }
+}
+
+// MARK: - Transferable export (writes lazily, only when share is invoked)
+
+private struct MarkdownExport: Transferable {
+    let filename: String
+    let text: String
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .plainText) { export in
+            let url = FileManager.default.temporaryDirectory
+                .appendingPathComponent(export.filename)
+            try export.text.write(to: url, atomically: true, encoding: .utf8)
+            return SentTransferredFile(url)
+        }
+        .suggestedFileName { $0.filename }
+    }
+}
+
+// MARK: - Save error alert model
+
+private struct SaveAlert: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+}
+
+// MARK: - FileDocument for Save as New File
+
+struct MarkdownFileDocument: FileDocument {
+    static var readableContentTypes: [UTType] {
+        [UTType("net.daringfireball.markdown") ?? .plainText, .plainText]
+    }
+
+    static var writableContentTypes: [UTType] {
+        [UTType("net.daringfireball.markdown") ?? .plainText]
+    }
+
+    var text: String
+
+    init(text: String) {
+        self.text = text
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents,
+              let string = String(data: data, encoding: .utf8) else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        self.text = string
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: Data(text.utf8))
+    }
+}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<!--
+  Content-Security-Policy: limits what the preview is allowed to do with
+  user markdown. Scripts can only come from this bundle (blocks inline
+  scripts injected via raw HTML in .md files). connect-src 'none' kills
+  any outbound fetch/XHR/WebSocket, preventing exfiltration of document
+  content. Images are allowed from https: + data: so normal markdown
+  images still render.
+-->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' file: data: https: markflow-file:;
+               connect-src 'none';
+               font-src 'self' data:;
+               worker-src blob:;">
+<style>
+@font-face {
+  font-family: 'iAWriterQuattroS-Regular';
+  src: url('iAWriterQuattroS-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'iAWriterQuattroS-Regular';
+  src: url('iAWriterQuattroS-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrainsMono-Regular';
+  src: url('JetBrainsMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrainsMono-Regular';
+  src: url('JetBrainsMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  color-scheme: light dark;
+  --fg: #1c1c1e;
+  --bg: #ffffff;
+  --muted: #6e6e73;
+  --rule: #e5e5ea;
+  --code-bg: #f6f8fa;
+  --link: #007aff;
+  --checkbox-border: #c7c7cc;
+  --checkbox-checked: #34c759;
+  --body-font: -apple-system, "SF Pro Text", BlinkMacSystemFont, sans-serif;
+  --body-font-stretch: normal;
+  --body-font-size: 17px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #f2f2f7;
+    --bg: #000000;
+    --muted: #8e8e93;
+    --rule: #2c2c2e;
+    --code-bg: #161b22;
+    --link: #0a84ff;
+    --checkbox-border: #48484a;
+    --checkbox-checked: #30d158;
+  }
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body-font);
+  font-size: var(--body-font-size);
+  line-height: 1.5;
+  font-stretch: var(--body-font-stretch);
+  -webkit-text-size-adjust: 100%;
+}
+#content {
+  padding: 20px 20px 60px;
+  word-wrap: break-word;
+}
+#content > :first-child { margin-top: 0; }
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+}
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 19px; }
+h4, h5, h6 { font-size: 17px; }
+p { margin: 0.75em 0; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.5em 0;
+}
+code {
+  font-family: "SF Mono", Menlo, monospace;
+  font-size: 15px;
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  display: block;
+}
+pre code.hljs { padding: 0; background: transparent; }
+blockquote {
+  border-left: 3px solid var(--rule);
+  margin: 0.75em 0;
+  padding: 0.25em 0 0.25em 14px;
+  color: var(--muted);
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 1.5em 0;
+}
+ul, ol { padding-left: 24px; margin: 0.5em 0; }
+li { margin: 0.25em 0; }
+
+/* Task list (GFM checkboxes) */
+ul.contains-task-list { list-style: none; padding-left: 4px; }
+ul.contains-task-list ul.contains-task-list { padding-left: 20px; }
+li.task-list-item { position: relative; padding-left: 4px; }
+li.task-list-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--checkbox-border);
+  border-radius: 4px;
+  margin: 0 8px 0 0;
+  vertical-align: -3px;
+  background: var(--bg);
+  position: relative;
+  cursor: default;
+}
+li.task-list-item input[type="checkbox"]:checked {
+  background: var(--checkbox-checked);
+  border-color: var(--checkbox-checked);
+}
+li.task-list-item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Table */
+table {
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  width: 100%;
+  font-size: 15px;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 6px 10px;
+  text-align: left;
+}
+th { background: var(--code-bg); font-weight: 600; }
+
+/* Mermaid */
+.mermaid {
+  background: var(--bg);
+  text-align: center;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+.mermaid svg { max-width: 100%; height: auto; }
+
+#empty {
+  color: var(--muted);
+  font-style: italic;
+  padding: 40px 20px;
+  text-align: center;
+}
+</style>
+
+<!-- highlight.js theme — swapped at runtime for dark mode -->
+<link rel="stylesheet" id="hljs-theme" href="highlight-github.css">
+
+<script src="marked.min.js"></script>
+<script src="highlight.min.js"></script>
+<!-- mermaid.min.js (~3 MB) is loaded lazily from preview.js — only when a ```mermaid block is present. -->
+</head>
+<body>
+<div id="content"><div id="empty">Nothing here yet — tap Edit to start.</div></div>
+<script src="preview.js"></script>
+</body>
+</html>

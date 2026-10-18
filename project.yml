@@ -1,0 +1,34 @@
+name: Markflow
+options:
+  bundleIdPrefix: com.san
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: "QAMM2A6WRQ"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+targets:
+  Markflow:
+    type: application
+    platform: iOS
+    sources:
+      - path: Markflow
+    resources:
+      - path: Markflow/PrivacyInfo.xcprivacy
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.san.markflow
+        PRODUCT_NAME: Markflow
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Markflow/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "0.2.0"
+        CURRENT_PROJECT_VERSION: "6"
